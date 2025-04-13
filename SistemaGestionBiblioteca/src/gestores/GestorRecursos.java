@@ -14,12 +14,10 @@ public class GestorRecursos {
 
     public void agregarRecurso(RecursoDigital recurso) {
         this.recursos.add(recurso);
-        System.out.println("Recurso: " + recurso.getTitulo() + "agregado");
     }
 
     public void eliminarRecurso(String titulo){
         recursos.removeIf(recurso -> recurso.getTitulo().equals(titulo));
-        System.out.println("Recurso: " + titulo + "eliminado correctamente");
     }
 
     public RecursoDigital buscarRecurso(String titulo){
@@ -28,7 +26,6 @@ public class GestorRecursos {
                 return recurso;
             }
         }
-        System.out.println("Recurso: " + titulo + "no encontrado.");
         return null;
     }
 }
