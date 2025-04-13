@@ -8,11 +8,14 @@ public class Usuario {
     private String email;
 
     public Usuario(String nombre,String email) {
-        if (nombre == null){
-            throw new IllegalArgumentException("Error. Debe ingresar un nombre");
+        if (nombre == null || nombre.trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre no puede ser nulo.");
         }
-        if (email == null){
-            throw new IllegalArgumentException("Error. Debe ingresar una dirección de mail");
+        if (email == null || email.trim().isEmpty()) {
+            throw new IllegalArgumentException("El email no puede ser nulo.");
+        }
+        if (!email.contains("@")) {
+            throw new IllegalArgumentException("El email no es válido. Debe contener '@'.");
         }
         this.nombre = nombre;
         this.Id = UUID.randomUUID().toString();
@@ -32,15 +35,18 @@ public class Usuario {
     }
 
     public void setNombre(String nombre) {
-        if (nombre == null){
-            throw new IllegalArgumentException("Error. Debe ingresar un nombre");
+        if (nombre == null || nombre.trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre no puede ser nulo.");
         }
         this.nombre = nombre;
     }
 
     public void setEmail(String email) {
-        if (email == null){
-            throw new IllegalArgumentException("Error. Debe ingresar una dirección de mail");
+        if (email == null || email.trim().isEmpty()) {
+            throw new IllegalArgumentException("El email no puede ser nulo o vacío.");
+        }
+        if (!email.contains("@")) {
+            throw new IllegalArgumentException("El email no es válido. Debe contener '@'.");
         }
         this.email = email;
     }
