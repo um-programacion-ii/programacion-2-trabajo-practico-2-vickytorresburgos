@@ -1,4 +1,4 @@
-package models;
+package modelos;
 
 public abstract class RecursoDigital {
     private String autor;
