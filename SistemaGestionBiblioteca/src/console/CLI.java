@@ -1,9 +1,8 @@
-package consola;
+package console;
 
-import gestores.GestorRecursos;
-import gestores.GestorUsuarios;
-import modelos.RecursoDigital;
-import modelos.Usuario;
+import models.*;
+import services.GestorRecursos;
+import services.GestorUsuarios;
 
 import java.util.Scanner;
 
@@ -91,7 +90,7 @@ public class CLI {
                     System.out.println("Buscar Usuario");
                     System.out.println("Ingrese el ID del usuario: ");
                     String idBuscar = scanner.nextLine();
-                    modelos.Usuario usuario = gestorUsuarios.buscarUsuario(idBuscar);
+                    models.Usuario usuario = gestorUsuarios.buscarUsuario(idBuscar);
                     if (usuario != null) {
                         System.out.println("Usuario encontrado! \n" +
                                 "Nombre: " + usuario.getNombre() +
@@ -127,16 +126,77 @@ public class CLI {
             switch (opcion) {
                 case 1:
                     System.out.println("Agregar Recurso");
-                    try{
+                    System.out.println("Seleccione el tipo de recurso que desea agregar");
+                    System.out.println("1. Audiolibro");
+                    System.out.println("2. Ensayo");
+                    System.out.println("3. Libro");
+                    System.out.println("4. Revista");
+                    System.out.println("5. Volver");
+
+                    int tipoRecurso = scanner.nextInt();
+                    scanner.nextLine();
+
+                    if (tipoRecurso == 5) break;
+
+                    try {
                         System.out.println("Ingrese el titulo del recurso: ");
                         String titulo = scanner.nextLine();
 
-                        System.out.println("Recurso agregado exitosamente.");
+                        System.out.println("Ingrese el autor del recurso: ");
+                        String autor = scanner.nextLine();
+
+                        String tipo = switch (tipoRecurso) {
+                            case 1 -> "audiolibro";
+                            case 2 -> "ensayo";
+                            case 3 -> "libro";
+                            case 4 -> "revista";
+                            default -> throw new IllegalArgumentException("Opción de recurso inválida.");
+                        };
+
+                        RecursoDigital recurso = null;
+
+                        switch (tipo.toLowerCase()) {
+                            case "audiolibro":
+                                System.out.println("Ingrese el formato:");
+                                String formato = scanner.nextLine();
+                                recurso = new Audiolibro(autor, titulo, formato);
+                                break;
+
+                            case "ensayo":
+                                System.out.println("Ingrese el tema del ensayo:");
+                                String tema = scanner.nextLine();
+                                recurso = new Ensayo(autor, titulo, tema);
+                                break;
+
+                            case "libro":
+                                System.out.println("Ingrese el género del libro:");
+                                String genero = scanner.nextLine();
+                                recurso = new Libro(autor, titulo, genero);
+                                break;
+
+                            case "revista":
+                                System.out.println("Ingrese la categoría de la revista:");
+                                String categoria = scanner.nextLine();
+                                recurso = new Revista(autor, titulo, categoria);
+                                break;
+
+                            default:
+                                throw new IllegalArgumentException("Tipo de recurso no valido");
+                        }
+                        // Agregar el recurso al GestorRecursos
+                        if (recurso != null) {
+                            gestorRecursos.agregarRecurso(recurso);
+                            System.out.println("Recurso agregado exitosamente.");
+                        } else {
+                            System.out.println("Error: No se pudo crear el recurso.");
+                        }
+
                     } catch (IllegalArgumentException e) {
                         System.out.println("Error al agregar el recurso: " + e.getMessage());
-                        System.out.println("Por favor, revise los datos ingresados.");
+                    } catch (Exception e) {
+                        System.out.println("Ocurrió un error inesperado: " + e.getMessage());
                     }
-                    break;
+                break;
 
                 case 2:
                     System.out.println("Eliminar Recurso");
@@ -144,7 +204,7 @@ public class CLI {
                 case 3:
                     System.out.print("Ingrese el ID del recurso a buscar: ");
                     String idBuscar = scanner.nextLine();
-                    modelos.RecursoDigital recursoEncontrado = gestorRecursos.buscarRecurso(idBuscar);
+                    models.RecursoDigital recursoEncontrado = gestorRecursos.buscarRecurso(idBuscar);
                     if (recursoEncontrado != null) {
                         System.out.println("Recurso encontrado: Título=" + recursoEncontrado.getTitulo());
                     }

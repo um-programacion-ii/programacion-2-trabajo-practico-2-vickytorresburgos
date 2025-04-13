@@ -1,18 +1,18 @@
 package models;
 
 public class Audiolibro extends RecursoDigital{
-    public int duracion;
+    public String formato;
 
-    public Audiolibro(String autor, String titulo, int duracion) {
+    public Audiolibro(String autor, String titulo, String duracion) {
         super(autor, titulo);
-        this.duracion = duracion;
+        this.formato = duracion;
     }
 
-    public int getDuracion() {
-        return duracion;
+    public String getDuracion() {
+        return formato;
     }
 
-    public void setDuracion(int duracion) {
-        this.duracion = duracion;
+    public void setDuracion(String duracion) {
+        this.formato = formato;
     }
 }

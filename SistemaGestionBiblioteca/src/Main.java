@@ -1,6 +1,6 @@
-import consola.CLI;
-import gestores.GestorRecursos;
-import gestores.GestorUsuarios;
+import console.CLI;
+import services.GestorRecursos;
+import services.GestorUsuarios;
 import java.util.Scanner;
 
 public class Main {
