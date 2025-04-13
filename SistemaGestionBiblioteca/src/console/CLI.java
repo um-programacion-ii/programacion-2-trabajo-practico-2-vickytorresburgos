@@ -72,7 +72,6 @@ public class CLI {
                         String nombre = scanner.nextLine();
                         System.out.println("Ingrese el email del usuario: ");
                         String email = scanner.nextLine();
-
                         gestorUsuarios.agregarUsuario(new Usuario(nombre, email));
                         System.out.println("Usuario agregado exitosamente.");
 
