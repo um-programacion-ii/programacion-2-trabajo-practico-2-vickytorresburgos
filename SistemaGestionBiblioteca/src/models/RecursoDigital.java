@@ -1,4 +1,4 @@
-package modelos;
+package models;
 
 
 public abstract class RecursoDigital {
