@@ -37,4 +37,10 @@ public abstract class RecursoDigital {
         }
         this.titulo = titulo;
     }
+
+    public void mostrarInformacion() {
+        System.out.println("Título: " + getTitulo());
+        System.out.println("Autor: " + getAutor());
+        System.out.println("Tipo: " + this.getClass().getSimpleName());
+    }
 }
