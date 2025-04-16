@@ -15,4 +15,8 @@ public class Revista extends RecursoDigital{
     public void setCategoria(String categoria) {
         this.categoria = categoria;
     }
-}
+
+    public void mostrarInformacion() {
+        super.mostrarInformacion();
+        System.out.println("Categoría: " + categoria);
+    }}
