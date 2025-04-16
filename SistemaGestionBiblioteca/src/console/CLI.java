@@ -4,6 +4,7 @@ import models.*;
 import services.GestorRecursos;
 import services.GestorUsuarios;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class CLI {
@@ -114,6 +115,7 @@ public class CLI {
         System.out.println("2. Eliminar Recurso");
         System.out.println("3. Buscar Recurso");
         System.out.println("4. Volver al Menú Principal");
+        System.out.println("5. Mostrar todos los recursos");
     }
 
     public void ejecutarMenuRecursos() {
@@ -212,6 +214,19 @@ public class CLI {
                 case 4:
                     System.out.println("Volver al Menú Principal");
                     ejecutarMenuPrincipal();
+                    break;
+                case 5:
+                    System.out.println("Listado de Recursos:");
+                    List<RecursoDigital> recursos = gestorRecursos.mostrarRecursos();
+
+                    if (recursos.isEmpty()) {
+                        System.out.println("No hay recursos registrados.");
+                    } else {
+                        for (RecursoDigital recurso : recursos) {
+                            recurso.mostrarInformacion();
+                            System.out.println("----------------------------");
+                        }
+                    }
                     break;
                 default:
                     System.out.println("Opción inválida. Intente nuevamente");
