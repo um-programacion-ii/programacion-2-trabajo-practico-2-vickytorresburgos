@@ -6,38 +6,16 @@ import java.util.Scanner;
 
 
 public class GestorRecursos {
+
     private List<RecursoDigital> recursos;
+
+    public List<RecursoDigital> getRecursos() {
+        return this.recursos;
+    }
 
     public GestorRecursos() {
         this.recursos = new ArrayList<>();
     }
-
-    /*
-    public void agregarRecurso(String tipo, String autor, String titulo) {
-        RecursoDigital recurso;
-
-        switch (tipo.toLowerCase()) {
-            case "audiolibro":
-                System.out.println("Ingrese la duración (en minutos):");
-                String formato = scanner.nextInt();
-                scanner.nextLine();
-                recurso = new Audiolibro(autor, titulo, formato);
-                break;
-            case "ensayo":
-                recurso = new Ensayo(autor, titulo, tema);
-                break;
-            case "libro":
-                recurso = new Libro(autor, titulo, genero);
-                break;
-            case "revista":
-                recurso = new Revista(autor, titulo,categoria);
-                break;
-            default:
-                throw new IllegalArgumentException("Tipo de recurso no conocido");
-        }
-        this.recursos.add(recurso);
-    }
-    */
 
     public void agregarRecurso(RecursoDigital recurso) {
         this.recursos.add(recurso);
@@ -56,8 +34,8 @@ public class GestorRecursos {
         return null;
     }
 
-    public List<RecursoDigital> getRecursos() {
-        return recursos;
+    public List<RecursoDigital> mostrarRecursos() {
+        return new ArrayList<>(recursos);
     }
 
 }

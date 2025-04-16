@@ -15,4 +15,9 @@ public class Ensayo extends RecursoDigital{
     public void setTema(String tema) {
         this.tema = tema;
     }
+
+    public void mostrarInformacion() {
+        super.mostrarInformacion();
+        System.out.println("Tema: " + getTema());
+    }
 }

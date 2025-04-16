@@ -15,4 +15,9 @@ public class Libro extends RecursoDigital{
     public void setGenero(String genero) {
         this.genero = genero;
     }
+
+    public void mostrarInformacion() {
+        super.mostrarInformacion();
+        System.out.println("Género: " + getGenero());
+    }
 }
