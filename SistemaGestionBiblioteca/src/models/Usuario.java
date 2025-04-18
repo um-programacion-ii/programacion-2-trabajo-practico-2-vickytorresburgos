@@ -5,6 +5,7 @@ import java.util.UUID;
 public class Usuario {
     private String nombre;
     private final String Id;
+    private static int contadorUsuarios = 1;
     private String email;
     private String telefono;
 
@@ -20,7 +21,7 @@ public class Usuario {
             throw new IllegalArgumentException("El email no es válido. Debe contener '@'.");
         }
         this.nombre = nombre;
-        this.Id = UUID.randomUUID().toString();
+        this.Id = String.valueOf(contadorUsuarios++);
         this.email = email;
         this.telefono = telefono;
     }

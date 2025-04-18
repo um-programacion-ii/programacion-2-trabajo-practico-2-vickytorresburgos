@@ -64,6 +64,7 @@ public class CLI {
         System.out.println("2. Eliminar Usuario");
         System.out.println("3. Buscar Usuario");
         System.out.println("4. Volver al Menú Principal");
+        System.out.println("5. Mostrar lista de usuarios");
     }
 
     public void ejecutarMenuUsuarios() {
@@ -117,6 +118,10 @@ public class CLI {
                 case 4:
                     System.out.println("Volver al Menú Principal");
                     ejecutarMenuPrincipal();
+                    break;
+                case 5:
+                    System.out.println("Lista de usuarios: ");
+                    gestorUsuarios.mostrarUsuarios();
                     break;
                 default:
                     System.out.println("Opción inválida. Intente nuevamente");
@@ -210,7 +215,7 @@ public class CLI {
                     }
                     break;
 
-                case 3:
+                case 3: // arreglar esto para que busque por titulo y devuelva la informacion
                     System.out.print("Ingrese el titulo del recurso buscado: ");
                     titulo = scanner.nextLine();
 
