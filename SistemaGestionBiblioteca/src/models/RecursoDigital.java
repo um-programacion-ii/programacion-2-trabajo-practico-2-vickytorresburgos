@@ -4,6 +4,7 @@ package models;
 public abstract class RecursoDigital {
     private String autor;
     private String titulo;
+    private boolean disponible = true;
 
     public RecursoDigital(String autor, String titulo) {
         if (autor == null || autor.trim().isEmpty()) {
@@ -38,9 +39,22 @@ public abstract class RecursoDigital {
         this.titulo = titulo;
     }
 
+    public boolean estaDisponible() {
+        return disponible;
+    }
+
+    public String estadoDisponible() {
+        return disponible ? "Disponible" : "No Disponible";
+    }
+
+    public void setDisponible(boolean disponible) {
+        this.disponible = disponible;
+    }
+
     public void mostrarInformacion() {
-        System.out.println("Título: " + getTitulo());
-        System.out.println("Autor: " + getAutor());
-        System.out.println("Tipo: " + this.getClass().getSimpleName());
+        System.out.println(" - Título: " + getTitulo());
+        System.out.println(" - Autor: " + getAutor());
+        System.out.println(" - Tipo: " + this.getClass().getSimpleName());
+        System.out.println(" - Estado: " + estadoDisponible());
     }
 }

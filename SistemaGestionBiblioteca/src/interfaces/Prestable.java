@@ -1,7 +1,7 @@
 package interfaces;
 
 public interface Prestable {
-    void prestar();
-    void devolver();
-    boolean disponible();
+    void prestar();  // cambiar estado
+    void devolver(); // cambiar estado
+    boolean disponible(); // consultar estado
 }

@@ -1,6 +1,6 @@
 package interfaces;
 
 public interface Renovable {
-    void renovar();
-    int getCantidadRenovaciones();
+    void renovar(); // agrega renovacion
+    int getCantidadRenovaciones(); // devuelve renovaciones
 }
