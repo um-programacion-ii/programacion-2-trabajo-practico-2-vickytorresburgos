@@ -41,13 +41,10 @@ public class GestorRecursos {
         return null;
     }
 
-    public RecursoDigital buscarPorTitulo(String titulo) {
-        for (RecursoDigital recurso : recursos) {
-            if(recurso.getTitulo().equalsIgnoreCase(titulo)) {
-                return recurso;
-            }
-        }
-        return null;
+    public List buscarPorTitulo(String parteTitulo) {
+        return recursos.stream()
+                .filter(r -> r.getTitulo().toLowerCase().contains(parteTitulo.toLowerCase()))
+                .toList();
     }
 
     public List<RecursoDigital> mostrarRecursos() {
