@@ -8,14 +8,13 @@ import java.util.List;
 
 public class GestorRecursos {
 
-    private final List<RecursoDigital> recursos;
+    private final List<RecursoDigital> recursos = new ArrayList<>();
+
+    public GestorRecursos() {
+    }
 
     public List<RecursoDigital> getRecursos() {
         return this.recursos;
-    }
-
-    public GestorRecursos() {
-        this.recursos = new ArrayList<>();
     }
 
     public void agregarRecurso(TipoRecurso tipoRecurso, String titulo, String autor, String detalle) {
@@ -36,6 +35,15 @@ public class GestorRecursos {
     public RecursoDigital buscarRecurso(String titulo, String autor){
         for (RecursoDigital recurso : recursos){
             if (recurso.getTitulo().equalsIgnoreCase(titulo) && recurso.getAutor().equalsIgnoreCase(autor)){
+                return recurso;
+            }
+        }
+        return null;
+    }
+
+    public RecursoDigital buscarPorTitulo(String titulo) {
+        for (RecursoDigital recurso : recursos) {
+            if(recurso.getTitulo().equalsIgnoreCase(titulo)) {
                 return recurso;
             }
         }
