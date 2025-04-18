@@ -1,4 +1,6 @@
 package gestores;
+import exceptions.RecursoNoDisponibleException;
+import exceptions.RecursoNoEncontradoException;
 import interfaces.Prestable;
 import interfaces.Renovable;
 import models.*;
@@ -48,7 +50,7 @@ public class GestorRecursos {
         return null;
     }
 
-    public List<RecursoDigital> buscarPorTituloYAutor(String titulo, String autor) {
+    public List<RecursoDigital> buscarPorTituloYAutor(String titulo, String autor) throws RecursoNoEncontradoException {
         List<RecursoDigital> resultados = new ArrayList<>();
         for (RecursoDigital recurso : recursos) {
             boolean coincideTitulo = titulo == null || titulo.isBlank() || recurso.getTitulo().toLowerCase().contains(titulo.toLowerCase());
@@ -56,6 +58,9 @@ public class GestorRecursos {
             if (coincideTitulo && coincideAutor) {
                 resultados.add(recurso);
             }
+        }
+        if (resultados.isEmpty()) {
+            throw new RecursoNoEncontradoException("No se encontraron recursos con ese título y autor.");
         }
         return resultados;
     }

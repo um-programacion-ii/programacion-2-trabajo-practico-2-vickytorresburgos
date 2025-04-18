@@ -1,4 +1,5 @@
 import console.CLI;
+import exceptions.RecursoNoEncontradoException;
 import gestores.GestorRecursos;
 import gestores.GestorUsuarios;
 import services.NotificacionesService;
@@ -9,7 +10,7 @@ import services.NotificacionesServiceSMS;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws RecursoNoEncontradoException {
 
         NotificacionesService notificacionesServiceEmail = new NotificacionesServiceEmail();
         NotificacionesService notificacionesServiceSMS = new NotificacionesServiceSMS();
