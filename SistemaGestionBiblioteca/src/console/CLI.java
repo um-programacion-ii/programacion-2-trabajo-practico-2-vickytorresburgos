@@ -4,18 +4,26 @@ import gestores.RecursoNoDisponibleException;
 import models.*;
 import gestores.GestorRecursos;
 import gestores.GestorUsuarios;
+import services.NotificacionesService;
+import services.NotificacionesServiceEmail;
+import services.NotificacionesServiceSMS;
 
 import java.util.List;
 import java.util.Scanner;
+import java.util.UUID;
 
 public class CLI {
     private GestorUsuarios gestorUsuarios;
     private GestorRecursos gestorRecursos;
     private Scanner scanner;
+    private final NotificacionesService notificacionesServiceEmail;
+    private final NotificacionesService notificacionesServiceSMS;
 
-    public CLI(GestorUsuarios gestorUsuarios, GestorRecursos gestorRecursos, Scanner scanner) {
+    public CLI(GestorUsuarios gestorUsuarios, GestorRecursos gestorRecursos, Scanner scanner, NotificacionesService notificacionesServiceEmail, NotificacionesService notificacionesServiceSMS) {
         this.gestorUsuarios = gestorUsuarios;
         this.gestorRecursos = gestorRecursos;
+        this.notificacionesServiceEmail = notificacionesServiceEmail;
+        this.notificacionesServiceSMS = notificacionesServiceSMS;
         this.scanner = new Scanner(System.in);
     }
 
@@ -51,7 +59,7 @@ public class CLI {
     }
 
     public void mostrarMenuUsuarios() {
-        System.out.println("A través de este menu podrá gestionar los usuario de la biblioteca! Seleccione una opción para continuar: ");
+        System.out.println("A través de este menu podrá gestionar los usuario de la biblioteca! \nSeleccione una opción para continuar: ");
         System.out.println("1. Agregar Usuario");
         System.out.println("2. Eliminar Usuario");
         System.out.println("3. Buscar Usuario");
@@ -68,17 +76,23 @@ public class CLI {
             switch (opcion) {
                 case 1:
                     System.out.println("Agregar Usuario");
-                    try{
-                        System.out.println("Ingrese el nombre del usuario: ");
+                    try {
+                        System.out.println("Ingrese el nombre y apellido del usuario: ");
                         String nombre = scanner.nextLine();
+
                         System.out.println("Ingrese el email del usuario: ");
                         String email = scanner.nextLine();
-                        gestorUsuarios.agregarUsuario(new Usuario(nombre, email));
-                        System.out.println("Usuario agregado exitosamente.");
 
-                    } catch (IllegalArgumentException e) {
-                        System.out.println("Error al agregar usuario: " + e.getMessage());
-                        System.out.println("Por favor, revise los datos ingresados.");
+                        System.out.println("Ingrese el telefono del usuario: ");
+                        String telefono = scanner.nextLine();
+
+                        System.out.println("¿Cómo desea notificar al usuario? (Email/SMS): ");
+                        String preferenciaNotificacion = scanner.nextLine().toLowerCase();
+
+                        gestorUsuarios.registrarUsuario(nombre, email, telefono, preferenciaNotificacion, notificacionesServiceEmail, notificacionesServiceSMS);
+                        System.out.println("Usuario agregado exitosamente");
+                    } catch (IllegalArgumentException e ) {
+                        System.out.println("Error al agregar al usuario: " + e.getMessage());
                     }
                     break;
 
@@ -169,6 +183,7 @@ public class CLI {
                     System.out.println("Ingrese el autor del recurso: ");
                     autor = scanner.nextLine();
 
+                    // arreglar esto
                     System.out.println("Ingrese el detalle del recurso (formato si desea agregar un audiolibro, tema si desea agregar un ensayo, \ngénero si desea agregar un libro y categoría si desea agregar una revista): ");
                     String detalle = scanner.nextLine();
 
