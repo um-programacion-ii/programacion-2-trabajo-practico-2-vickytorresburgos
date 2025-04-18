@@ -48,10 +48,16 @@ public class GestorRecursos {
         return null;
     }
 
-    public List buscarPorTitulo(String parteTitulo) {
-        return recursos.stream()
-                .filter(r -> r.getTitulo().toLowerCase().contains(parteTitulo.toLowerCase()))
-                .toList();
+    public List<RecursoDigital> buscarPorTituloYAutor(String titulo, String autor) {
+        List<RecursoDigital> resultados = new ArrayList<>();
+        for (RecursoDigital recurso : recursos) {
+            boolean coincideTitulo = titulo == null || titulo.isBlank() || recurso.getTitulo().toLowerCase().contains(titulo.toLowerCase());
+            boolean coincideAutor = autor == null || autor.isBlank() || recurso.getAutor().toLowerCase().contains(autor.toLowerCase());
+            if (coincideTitulo && coincideAutor) {
+                resultados.add(recurso);
+            }
+        }
+        return resultados;
     }
 
     public List<RecursoDigital> mostrarRecursos() {
