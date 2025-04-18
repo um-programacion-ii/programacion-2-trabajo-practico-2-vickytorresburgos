@@ -11,6 +11,7 @@ public class Revista extends RecursoDigital implements Prestable, Renovable {
     public Revista(String autor, String titulo, String categoria) {
         super(autor, titulo);
         this.categoria = categoria;
+        this.setTipoRecurso(TipoRecurso.REVISTA);
     }
 
     public String getCategoria() {

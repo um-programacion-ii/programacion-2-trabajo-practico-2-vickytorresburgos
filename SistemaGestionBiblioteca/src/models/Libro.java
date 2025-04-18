@@ -11,6 +11,7 @@ public class Libro extends RecursoDigital implements Prestable, Renovable {
     public Libro(String autor, String titulo, String genero) {
         super(autor, titulo);
         this.genero = genero;
+        this.setTipoRecurso(TipoRecurso.LIBRO);
     }
 
     public String getGenero() {

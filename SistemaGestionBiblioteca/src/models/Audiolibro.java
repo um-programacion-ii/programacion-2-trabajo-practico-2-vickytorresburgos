@@ -9,6 +9,7 @@ public class Audiolibro extends RecursoDigital implements Prestable {
     public Audiolibro(String autor, String titulo, String formato) {
         super(autor, titulo);
         this.formato = formato;
+        this.setTipoRecurso(TipoRecurso.AUDIOLIBRO);
     }
 
     public String getFormato() {

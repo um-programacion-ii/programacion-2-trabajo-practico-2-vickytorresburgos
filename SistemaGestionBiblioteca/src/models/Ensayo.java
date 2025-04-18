@@ -11,6 +11,7 @@ public class Ensayo extends RecursoDigital implements Prestable, Renovable {
     public Ensayo(String autor, String titulo, String tema) {
         super(autor, titulo);
         this.tema = tema;
+        this.setTipoRecurso(TipoRecurso.ENSAYO);
     }
 
     public String getTema() {
