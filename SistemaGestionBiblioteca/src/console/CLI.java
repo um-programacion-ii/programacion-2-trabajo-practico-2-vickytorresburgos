@@ -1,21 +1,22 @@
 package console;
 
+import comparadores.ComparadorAutor;
+import comparadores.ComparadorRenovaciones;
+import comparadores.ComparadorTitulo;
 import gestores.RecursoNoDisponibleException;
+import interfaces.Renovable;
 import models.*;
 import gestores.GestorRecursos;
 import gestores.GestorUsuarios;
 import services.NotificacionesService;
-import services.NotificacionesServiceEmail;
-import services.NotificacionesServiceSMS;
 
 import java.util.List;
 import java.util.Scanner;
-import java.util.UUID;
 
 public class CLI {
-    private GestorUsuarios gestorUsuarios;
-    private GestorRecursos gestorRecursos;
-    private Scanner scanner;
+    private final GestorUsuarios gestorUsuarios;
+    private final GestorRecursos gestorRecursos;
+    private final Scanner scanner;
     private final NotificacionesService notificacionesServiceEmail;
     private final NotificacionesService notificacionesServiceSMS;
 
@@ -131,15 +132,16 @@ public class CLI {
 
     public void mostrarMenuRecursos() {
         System.out.println("A través de este menu podrá gestionar los recursos de la biblioteca! \nSeleccione una opción para continuar: ");
-        System.out.println("1. Agregar Recurso");
-        System.out.println("2. Eliminar Recurso");
-        System.out.println("3. Buscar Recurso");
+        System.out.println("1. Agregar recurso");
+        System.out.println("2. Eliminar recurso");
+        System.out.println("3. Buscar recurso");
         System.out.println("4. Prestar un recurso");
         System.out.println("5. Devolver un recurso");
         System.out.println("6. Renovar un recurso");
         System.out.println("7. Volver al Menú Principal");
         System.out.println("8. Mostrar todos los recursos");
         System.out.println("9. Mostrar recursos por tipo");
+        System.out.println("10. Ordenar recursos");
     }
 
     public void ejecutarMenuRecursos() {
@@ -194,6 +196,7 @@ public class CLI {
                     String detalle = scanner.nextLine();
 
                     try {
+                        assert tipoRecurso != null;
                         gestorRecursos.agregarRecurso(tipoRecurso, titulo, autor, detalle);
                         System.out.println("Recurso agregado exitosamente.");
                     } catch (IllegalArgumentException e) {
@@ -217,15 +220,24 @@ public class CLI {
                     break;
 
                 case 3: // arreglar esto para que busque por titulo y devuelva la informacion
-                    System.out.print("Ingrese el titulo del recurso buscado: ");
-                    titulo = scanner.nextLine();
+                    System.out.println("=== Buscar recurso por título y/o autor ===");
 
-                    System.out.print("Ingrese el autor del recurso buscado: ");
-                    autor = scanner.nextLine();
+                    System.out.print("Ingrese título (o deje vacío para ignorar): ");
+                    titulo = scanner.nextLine().trim();
 
-                    models.RecursoDigital recursoEncontrado = gestorRecursos.buscarRecurso(titulo, autor);
-                    if (recursoEncontrado != null) {
-                        System.out.println("Recurso encontrado: Título=" + recursoEncontrado.getTitulo());
+                    System.out.print("Ingrese autor (o deje vacío para ignorar): ");
+                    autor = scanner.nextLine().trim();
+
+                    List<RecursoDigital> resultados = gestorRecursos.buscarPorTituloYAutor(titulo, autor);
+
+                    if (resultados.isEmpty()) {
+                        System.out.println("No se encontraron recursos que coincidan con los criterios.");
+                    } else {
+                        System.out.println("Recursos encontrados:");
+                        for (RecursoDigital recurso : resultados) {
+                            recurso.mostrarInformacion();
+                            System.out.println("---------------------------");
+                        }
                     }
                     break;
                 case 4:
@@ -382,6 +394,37 @@ public class CLI {
 
                     if (tipoRecursoFiltro != null) {
                         mostrarRecursosPorTipo(tipoRecursoFiltro);
+                    }
+                    break;
+                case 10:
+                    System.out.println("Seleccione el criterio de ordenamiento:");
+                    System.out.println("1. Por título");
+                    System.out.println("2. Por autor");
+                    System.out.println("3. Por cantidad de renovaciones");
+                    int criterio = scanner.nextInt();
+                    scanner.nextLine();
+
+                    List<RecursoDigital> listaOrdenada = gestorRecursos.mostrarRecursos(); // Copia actual
+
+                    switch (criterio) {
+                        case 1:
+                            listaOrdenada.sort(new ComparadorTitulo());
+                            break;
+                        case 2:
+                            listaOrdenada.sort(new ComparadorAutor());
+                            break;
+                        case 3:
+                            listaOrdenada.sort(new ComparadorRenovaciones());
+                            break;
+                        default:
+                            System.out.println("Opción inválida.");
+                            continue;
+                    }
+
+                    System.out.println("Recursos ordenados:");
+                    for (RecursoDigital recurso : listaOrdenada) {
+                        recurso.mostrarInformacion();
+                        System.out.println("----------------------------");
                     }
                     break;
 
