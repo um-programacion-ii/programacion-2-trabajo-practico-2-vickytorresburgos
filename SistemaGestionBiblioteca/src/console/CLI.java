@@ -3,8 +3,9 @@ package console;
 import comparadores.ComparadorAutor;
 import comparadores.ComparadorRenovaciones;
 import comparadores.ComparadorTitulo;
-import gestores.RecursoNoDisponibleException;
-import interfaces.Renovable;
+import exceptions.RecursoNoDisponibleException;
+import exceptions.RecursoNoEncontradoException;
+import exceptions.UsuarioNoEncontradoException;
 import models.*;
 import gestores.GestorRecursos;
 import gestores.GestorUsuarios;
@@ -35,7 +36,7 @@ public class CLI {
         System.out.println("3. Salir");
     }
 
-    public void ejecutarMenuPrincipal() {
+    public void ejecutarMenuPrincipal() throws RecursoNoEncontradoException {
         int opcion;
         do {
             mostrarMenuPrincipal();
@@ -68,7 +69,7 @@ public class CLI {
         System.out.println("5. Mostrar lista de usuarios");
     }
 
-    public void ejecutarMenuUsuarios() {
+    public void ejecutarMenuUsuarios() throws RecursoNoEncontradoException {
         int opcion;
         do {
             mostrarMenuUsuarios();
@@ -108,12 +109,16 @@ public class CLI {
                     System.out.println("Buscar Usuario");
                     System.out.println("Ingrese el ID del usuario: ");
                     String idBuscar = scanner.nextLine();
-                    models.Usuario usuario = gestorUsuarios.buscarUsuario(idBuscar);
-                    if (usuario != null) {
-                        System.out.println("Usuario encontrado! \n" +
-                                "Nombre: " + usuario.getNombre() +
-                                "\nId: " + usuario.getId() +
-                                "\nEmail: " + usuario.getEmail());
+
+                    try {
+                        Usuario usuario = gestorUsuarios.buscarUsuario(idBuscar);
+                        System.out.println("Usuario encontrado:");
+                        System.out.println("ID: " + usuario.getId());
+                        System.out.println("Nombre: " + usuario.getNombre());
+                        System.out.println("Email: " + usuario.getEmail());
+                        System.out.println("Teléfono: " + usuario.getTelefono());
+                    } catch (UsuarioNoEncontradoException e) {
+                        System.out.println(e.getMessage());
                     }
                     break;
                 case 4:
@@ -144,7 +149,7 @@ public class CLI {
         System.out.println("10. Ordenar recursos");
     }
 
-    public void ejecutarMenuRecursos() {
+    public void ejecutarMenuRecursos() throws RecursoNoEncontradoException {
         int opcion;
         do {
             mostrarMenuRecursos();
@@ -191,12 +196,23 @@ public class CLI {
                     System.out.println("Ingrese el autor del recurso: ");
                     autor = scanner.nextLine();
 
-                    // arreglar esto
-                    System.out.println("Ingrese el detalle del recurso (formato si desea agregar un audiolibro, tema si desea agregar un ensayo, \ngénero si desea agregar un libro y categoría si desea agregar una revista): ");
+                    switch (tipoRecurso) {
+                        case AUDIOLIBRO:
+                            System.out.print("Ingrese el formato del audiolibro (MP3, WAV, etc.): ");
+                            break;
+                        case ENSAYO:
+                            System.out.print("Ingrese el tema del ensayo: ");
+                            break;
+                        case LIBRO:
+                            System.out.print("Ingrese el género del libro: ");
+                            break;
+                        case REVISTA:
+                            System.out.print("Ingrese la categoría de la revista: ");
+                            break;
+                    }
                     String detalle = scanner.nextLine();
 
                     try {
-                        assert tipoRecurso != null;
                         gestorRecursos.agregarRecurso(tipoRecurso, titulo, autor, detalle);
                         System.out.println("Recurso agregado exitosamente.");
                     } catch (IllegalArgumentException e) {
@@ -205,7 +221,6 @@ public class CLI {
                     break;
 
                 case 2:
-                    System.out.println("Eliminar Recurso");
                     System.out.println("Eliminar Recurso");
                     System.out.print("Ingrese el título del recurso a eliminar: ");
                     String tituloEliminar = scanner.nextLine();
@@ -219,7 +234,7 @@ public class CLI {
                     }
                     break;
 
-                case 3: // arreglar esto para que busque por titulo y devuelva la informacion
+                case 3:
                     System.out.println("=== Buscar recurso por título y/o autor ===");
 
                     System.out.print("Ingrese título (o deje vacío para ignorar): ");
@@ -228,17 +243,19 @@ public class CLI {
                     System.out.print("Ingrese autor (o deje vacío para ignorar): ");
                     autor = scanner.nextLine().trim();
 
-                    List<RecursoDigital> resultados = gestorRecursos.buscarPorTituloYAutor(titulo, autor);
+                    try {
+                        List<RecursoDigital> resultados = gestorRecursos.buscarPorTituloYAutor(titulo, autor);
 
-                    if (resultados.isEmpty()) {
-                        System.out.println("No se encontraron recursos que coincidan con los criterios.");
-                    } else {
                         System.out.println("Recursos encontrados:");
                         for (RecursoDigital recurso : resultados) {
                             recurso.mostrarInformacion();
                             System.out.println("---------------------------");
                         }
+
+                    } catch (RecursoNoEncontradoException e) {
+                        System.out.println(e.getMessage());
                     }
+
                     break;
                 case 4:
                     System.out.println("Prestar recurso \nSeleccione el recurso que desea prestar: ");
