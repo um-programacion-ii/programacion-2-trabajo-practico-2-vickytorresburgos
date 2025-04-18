@@ -6,8 +6,10 @@ public class Usuario {
     private String nombre;
     private final String Id;
     private String email;
+    private String telefono;
 
-    public Usuario(String nombre,String email) {
+
+    public Usuario(String nombre,String email, String telefono) {
         if (nombre == null || nombre.trim().isEmpty()) {
             throw new IllegalArgumentException("El nombre no puede ser nulo.");
         }
@@ -20,6 +22,7 @@ public class Usuario {
         this.nombre = nombre;
         this.Id = UUID.randomUUID().toString();
         this.email = email;
+        this.telefono = telefono;
     }
 
     public String getNombre() {
@@ -33,6 +36,8 @@ public class Usuario {
     public String getEmail() {
         return email;
     }
+
+    public String getTelefono() { return telefono; }
 
     public void setNombre(String nombre) {
         if (nombre == null || nombre.trim().isEmpty()) {
@@ -50,6 +55,9 @@ public class Usuario {
         }
         this.email = email;
     }
+
+    public void setTelefono(String telefono) { this.telefono = telefono; }
+
 
     public String getInformacion() {
         return "Informacion del usuario: " + this.getId() + "\n" +
