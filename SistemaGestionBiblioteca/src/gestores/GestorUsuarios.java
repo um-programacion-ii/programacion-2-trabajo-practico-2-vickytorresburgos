@@ -1,5 +1,6 @@
 package gestores;
 
+import exceptions.UsuarioNoEncontradoException;
 import models.Usuario;
 import services.NotificacionesService;
 
@@ -38,8 +39,13 @@ public class GestorUsuarios {
         usuarios.remove(id);
     }
 
-    public Usuario buscarUsuario(String id) {
-        return usuarios.get(id); // Devuelve null si no existe, igual que antes
+    public Usuario buscarUsuario(String id) throws UsuarioNoEncontradoException {
+            for (Usuario usuario : usuarios.values()) {
+                if (usuario.getId().equals(id)) {
+                    return usuario;
+                }
+            }
+            throw new UsuarioNoEncontradoException("No se encontro ningun usuario con el ID: " + id);
     }
 
     public Map<String, Usuario> getUsuarios() {
