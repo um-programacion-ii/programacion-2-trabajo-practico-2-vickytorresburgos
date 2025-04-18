@@ -4,6 +4,7 @@ import interfaces.Renovable;
 import models.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class GestorRecursos {
@@ -17,6 +18,13 @@ public class GestorRecursos {
         return this.recursos;
     }
 
+    public List<RecursoDigital> filtrarPorTipo(TipoRecurso tipoRecurso) {
+        return recursos.stream()
+                .filter(recurso -> recurso.getClass().getSimpleName().equalsIgnoreCase(tipoRecurso.name()))
+                .collect(Collectors.toList());
+    }
+
+
     public void agregarRecurso(TipoRecurso tipoRecurso, String titulo, String autor, String detalle) {
         RecursoDigital recurso = switch (tipoRecurso) {
             case AUDIOLIBRO -> new Audiolibro(autor, titulo, detalle);
@@ -24,7 +32,6 @@ public class GestorRecursos {
             case LIBRO -> new Libro(autor, titulo, detalle);
             case REVISTA -> new Revista(autor, titulo, detalle);
         };
-
         this.recursos.add(recurso);
     }
 

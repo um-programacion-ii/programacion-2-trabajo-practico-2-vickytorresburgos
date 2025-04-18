@@ -5,6 +5,8 @@ public abstract class RecursoDigital {
     private String autor;
     private String titulo;
     private boolean disponible = true;
+    private TipoRecurso tipoRecurso;
+
 
     public RecursoDigital(String autor, String titulo) {
         if (autor == null || autor.trim().isEmpty()) {
@@ -15,6 +17,14 @@ public abstract class RecursoDigital {
         }
         this.autor = autor;
         this.titulo = titulo;
+    }
+
+    public TipoRecurso getTipoRecurso() {
+        return tipoRecurso;
+    }
+
+    public void setTipoRecurso(TipoRecurso tipoRecurso) {
+        this.tipoRecurso = tipoRecurso;
     }
 
     public String getAutor() {
@@ -54,7 +64,7 @@ public abstract class RecursoDigital {
     public void mostrarInformacion() {
         System.out.println(" - Título: " + getTitulo());
         System.out.println(" - Autor: " + getAutor());
-        System.out.println(" - Tipo: " + this.getClass().getSimpleName());
+        System.out.println(" - Tipo: " + getTipoRecurso());
         System.out.println(" - Estado: " + estadoDisponible());
     }
 }

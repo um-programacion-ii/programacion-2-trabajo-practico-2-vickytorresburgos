@@ -139,6 +139,7 @@ public class CLI {
         System.out.println("6. Renovar un recurso");
         System.out.println("7. Volver al Menú Principal");
         System.out.println("8. Mostrar todos los recursos");
+        System.out.println("9. Mostrar recursos por tipo");
     }
 
     public void ejecutarMenuRecursos() {
@@ -319,7 +320,6 @@ public class CLI {
                             System.out.println("Recurso no encontrado.");
                             break;
                         }
-
                         gestorRecursos.renovarRecurso(recursoRenovar);
                         System.out.println("Recurso renovado correctamente.");
 
@@ -332,6 +332,7 @@ public class CLI {
                     System.out.println("Volver al Menú Principal");
                     ejecutarMenuPrincipal();
                     break;
+
                 case 8:
                     System.out.println("Listado de Recursos:");
                     List<RecursoDigital> recursos = gestorRecursos.mostrarRecursos();
@@ -345,9 +346,60 @@ public class CLI {
                         }
                     }
                     break;
+
+                case 9:
+                    System.out.println("Mostrar recursos por tipo");
+                    System.out.println("Seleccione el tipo de recurso que desea ver:");
+                    System.out.println("1. Audiolibro");
+                    System.out.println("2. Ensayo");
+                    System.out.println("3. Libro");
+                    System.out.println("4. Revista");
+                    System.out.println("5. Volver al menú de recursos");
+
+                    int tipoFiltro = scanner.nextInt();
+                    scanner.nextLine();
+
+                    TipoRecurso tipoRecursoFiltro = null;
+                    switch (tipoFiltro) {
+                        case 1:
+                            tipoRecursoFiltro = TipoRecurso.AUDIOLIBRO;
+                            break;
+                        case 2:
+                            tipoRecursoFiltro = TipoRecurso.ENSAYO;
+                            break;
+                        case 3:
+                            tipoRecursoFiltro = TipoRecurso.LIBRO;
+                            break;
+                        case 4:
+                            tipoRecursoFiltro = TipoRecurso.REVISTA;
+                            break;
+                        case 5:
+                            break;
+                        default:
+                            System.out.println("Opción inválida.");
+                            break;
+                    }
+
+                    if (tipoRecursoFiltro != null) {
+                        mostrarRecursosPorTipo(tipoRecursoFiltro);
+                    }
+                    break;
+
                 default:
                     System.out.println("Opción inválida. Intente nuevamente");
             }
         } while (opcion != 7);
+    }
+    public void mostrarRecursosPorTipo(TipoRecurso tipoRecurso) {
+        List<RecursoDigital> recursosFiltrados = gestorRecursos.filtrarPorTipo(tipoRecurso);
+
+        if (recursosFiltrados.isEmpty()) {
+            System.out.println("No se encontraron recursos de tipo " + tipoRecurso);
+        } else {
+            for (RecursoDigital recurso : recursosFiltrados) {
+                recurso.mostrarInformacion();  // Muestra la información del recurso
+                System.out.println("----------------------------");
+            }
+        }
     }
 }
