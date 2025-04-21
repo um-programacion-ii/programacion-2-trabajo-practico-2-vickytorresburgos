@@ -5,6 +5,7 @@ import gestores.GestorPrestamos;
 import gestores.GestorRecursos;
 import gestores.GestorReservas;
 import gestores.GestorUsuarios;
+import gestores.GestorNotificaciones;
 
 import services.NotificacionesService;
 import services.NotificacionesServiceEmail;
@@ -17,10 +18,12 @@ public class Main {
 
         NotificacionesService notificacionesServiceEmail = new NotificacionesServiceEmail();
         NotificacionesService notificacionesServiceSMS = new NotificacionesServiceSMS();
+        GestorNotificaciones gestorNotificaciones = new GestorNotificaciones();
+
 
         GestorUsuarios gestorUsuarios = new GestorUsuarios();
         GestorRecursos gestorRecursos = new GestorRecursos();
-        GestorReservas gestorReservas = new GestorReservas();
+        GestorReservas gestorReservas = new GestorReservas(gestorNotificaciones, notificacionesServiceEmail);
         GestorPrestamos gestorPrestamos = new GestorPrestamos(gestorReservas);
 
         Scanner scanner = new Scanner(System.in);

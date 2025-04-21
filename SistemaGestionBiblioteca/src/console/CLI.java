@@ -495,7 +495,6 @@ public class CLI {
                         }
 
                         gestorPrestamos.devolverRecurso(recursoDev, idUsuario);
-                        System.out.println("Recurso devuelto correctamente.");
 
                         gestorReservas.asignarReservaSiExiste(recursoDev, gestorPrestamos.getPrestamos());
 
