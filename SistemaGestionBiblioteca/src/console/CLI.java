@@ -3,14 +3,20 @@ package console;
 import comparadores.ComparadorAutor;
 import comparadores.ComparadorRenovaciones;
 import comparadores.ComparadorTitulo;
+
 import exceptions.RecursoNoDisponibleException;
 import exceptions.RecursoNoEncontradoException;
 import exceptions.UsuarioNoEncontradoException;
 import models.*;
+
 import gestores.GestorRecursos;
 import gestores.GestorUsuarios;
+import gestores.GestorPrestamos;
+
 import services.NotificacionesService;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -20,12 +26,14 @@ public class CLI {
     private final Scanner scanner;
     private final NotificacionesService notificacionesServiceEmail;
     private final NotificacionesService notificacionesServiceSMS;
+    private final GestorPrestamos gestorPrestamos;
 
-    public CLI(GestorUsuarios gestorUsuarios, GestorRecursos gestorRecursos, Scanner scanner, NotificacionesService notificacionesServiceEmail, NotificacionesService notificacionesServiceSMS) {
+    public CLI(GestorUsuarios gestorUsuarios, GestorRecursos gestorRecursos, Scanner scanner, NotificacionesService notificacionesServiceEmail, NotificacionesService notificacionesServiceSMS, GestorPrestamos gestorPrestamos) {
         this.gestorUsuarios = gestorUsuarios;
         this.gestorRecursos = gestorRecursos;
         this.notificacionesServiceEmail = notificacionesServiceEmail;
         this.notificacionesServiceSMS = notificacionesServiceSMS;
+        this.gestorPrestamos = gestorPrestamos;
         this.scanner = new Scanner(System.in);
     }
 
@@ -251,11 +259,9 @@ public class CLI {
                             recurso.mostrarInformacion();
                             System.out.println("---------------------------");
                         }
-
                     } catch (RecursoNoEncontradoException e) {
                         System.out.println(e.getMessage());
                     }
-
                     break;
                 case 4:
                     System.out.println("Prestar recurso \nSeleccione el recurso que desea prestar: ");
@@ -270,6 +276,14 @@ public class CLI {
                     if (tipoPrestable == 5) break;
 
                     try {
+                        System.out.println("Ingrese el ID del usuario: ");
+                        String idUsuario = scanner.nextLine();
+                        Usuario usuario = gestorUsuarios.buscarUsuario(idUsuario);
+                        if (usuario == null) {
+                            System.out.println("Usuario no encontrado.");
+                            break;
+                        }
+
                         System.out.println("Ingrese el titulo del recurso: ");
                         titulo = scanner.nextLine();
 
@@ -282,35 +296,23 @@ public class CLI {
                             System.out.println("Recurso no encontrado.");
                             break;
                         }
-                        switch (tipoPrestable) {
-                            case 1:
-                                System.out.println("Creando prestamo de audiolibro");
-                                gestorRecursos.prestarRecurso(recurso);
-                                System.out.println("Préstamo realizado con éxito");
-                                break;
 
-                            case 2:
-                                System.out.println("Creando prestamo de ensayo");
-                                gestorRecursos.prestarRecurso(recurso);
-                                System.out.println("Préstamo realizado con éxito");
-                                break;
-                            case 3:
-                                System.out.println("Creando prestamo de libro");
-                                gestorRecursos.prestarRecurso(recurso);
-                                break;
-                            case 4:
-                                System.out.println("Creando prestamo de revista");
-                                gestorRecursos.prestarRecurso(recurso);
-                                System.out.println("Préstamo realizado con éxito");
-                                break;
-                            default:
-                                System.out.println("Opción inválida.");
-                        }
+                        System.out.println("Ingrese la fecha de inicio del préstamo (YYYY-MM-DD):");
+                        LocalDate fechaInicio = LocalDate.parse(scanner.nextLine());
 
+                        System.out.println("Ingrese la fecha de fin del préstamo (YYYY-MM-DD):");
+                        LocalDate fechaFin = LocalDate.parse(scanner.nextLine());
+
+                        gestorPrestamos.prestarRecurso(usuario, recurso, fechaInicio, fechaFin);
+                        System.out.println("¡Préstamo registrado con éxito!");
+
+                    } catch (DateTimeParseException e) {
+                            System.out.println("Formato de fecha inválido. Use el formato YYYY-MM-DD.");
                     } catch (RecursoNoDisponibleException e) {
-                        System.out.println("Error: " + e.getMessage());
+                            System.out.println("Error al realizar el préstamo: " + e.getMessage());
                     }
                     break;
+
                 case 5:
                     System.out.println("Devolver recurso:");
                     try {
@@ -327,7 +329,7 @@ public class CLI {
                             break;
                         }
 
-                        gestorRecursos.devolverRecurso(recursoDev);
+                        gestorPrestamos.devolverRecurso(recursoDev);
                         System.out.println("Recurso devuelto correctamente.");
 
                     } catch (RecursoNoDisponibleException e) {

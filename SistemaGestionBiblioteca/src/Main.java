@@ -1,5 +1,6 @@
 import console.CLI;
 import exceptions.RecursoNoEncontradoException;
+import gestores.GestorPrestamos;
 import gestores.GestorRecursos;
 import gestores.GestorUsuarios;
 import services.NotificacionesService;
@@ -17,9 +18,10 @@ public class Main {
 
         GestorUsuarios gestorUsuarios = new GestorUsuarios();
         GestorRecursos gestorRecursos = new GestorRecursos();
+        GestorPrestamos gestorPrestamos = new GestorPrestamos();
         Scanner scanner = new Scanner(System.in);
 
-        CLI cli = new CLI(gestorUsuarios, gestorRecursos, scanner, notificacionesServiceEmail, notificacionesServiceSMS);
+        CLI cli = new CLI(gestorUsuarios, gestorRecursos, scanner, notificacionesServiceEmail, notificacionesServiceSMS,gestorPrestamos);
 
         cli.ejecutarMenuPrincipal();
         scanner.close();
