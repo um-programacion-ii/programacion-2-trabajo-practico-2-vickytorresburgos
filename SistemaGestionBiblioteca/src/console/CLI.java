@@ -7,6 +7,7 @@ import comparadores.ComparadorTitulo;
 import exceptions.RecursoNoDisponibleException;
 import exceptions.RecursoNoEncontradoException;
 import exceptions.UsuarioNoEncontradoException;
+import gestores.GestorReservas;
 import models.*;
 
 import gestores.GestorRecursos;
@@ -27,13 +28,15 @@ public class CLI {
     private final NotificacionesService notificacionesServiceEmail;
     private final NotificacionesService notificacionesServiceSMS;
     private final GestorPrestamos gestorPrestamos;
+    private final GestorReservas gestorReservas;
 
-    public CLI(GestorUsuarios gestorUsuarios, GestorRecursos gestorRecursos, Scanner scanner, NotificacionesService notificacionesServiceEmail, NotificacionesService notificacionesServiceSMS, GestorPrestamos gestorPrestamos) {
+    public CLI(GestorUsuarios gestorUsuarios, GestorRecursos gestorRecursos, Scanner scanner, NotificacionesService notificacionesServiceEmail, NotificacionesService notificacionesServiceSMS, GestorPrestamos gestorPrestamos, GestorReservas gestorReservas) {
         this.gestorUsuarios = gestorUsuarios;
         this.gestorRecursos = gestorRecursos;
         this.notificacionesServiceEmail = notificacionesServiceEmail;
         this.notificacionesServiceSMS = notificacionesServiceSMS;
         this.gestorPrestamos = gestorPrestamos;
+        this.gestorReservas = gestorReservas;
         this.scanner = new Scanner(System.in);
     }
 
@@ -41,7 +44,9 @@ public class CLI {
         System.out.println("Bienvenido a la biblioteca digital de la UM! \nSeleccione una opción para continuar: ");
         System.out.println("1. Gestión de Usuarios");
         System.out.println("2. Gestión de Recursos");
-        System.out.println("3. Salir");
+        System.out.println("3. Gestión de Préstamos");
+        System.out.println("4. Gestión de Reservas");
+        System.out.println("5. Salir");
     }
 
     public void ejecutarMenuPrincipal() throws RecursoNoEncontradoException {
@@ -59,12 +64,18 @@ public class CLI {
                     ejecutarMenuRecursos();
                     break;
                 case 3:
+                    ejecutarMenuPrestamos();
+                    break;
+                case 4:
+                    ejecutarMenuReservas();
+                    break;
+                case 5:
                     System.out.println("Saliendo de la biblioteca digital...");
                     break;
                 default:
                     System.out.println("Opción inválida. Intente nuevamente.");
             }
-        } while (opcion != 3);
+        } while (opcion != 5);
         scanner.close();
     }
 
@@ -102,7 +113,7 @@ public class CLI {
 
                         gestorUsuarios.registrarUsuario(nombre, email, telefono, preferenciaNotificacion, notificacionesServiceEmail, notificacionesServiceSMS);
                         System.out.println("Usuario agregado exitosamente");
-                    } catch (IllegalArgumentException e ) {
+                    } catch (IllegalArgumentException e) {
                         System.out.println("Error al agregar al usuario: " + e.getMessage());
                     }
                     break;
@@ -148,13 +159,10 @@ public class CLI {
         System.out.println("1. Agregar recurso");
         System.out.println("2. Eliminar recurso");
         System.out.println("3. Buscar recurso");
-        System.out.println("4. Prestar un recurso");
-        System.out.println("5. Devolver un recurso");
-        System.out.println("6. Renovar un recurso");
+        System.out.println("4. Mostrar todos los recursos");
+        System.out.println("5. Mostrar recursos por tipo");
+        System.out.println("6. Ordenar recursos");
         System.out.println("7. Volver al Menú Principal");
-        System.out.println("8. Mostrar todos los recursos");
-        System.out.println("9. Mostrar recursos por tipo");
-        System.out.println("10. Ordenar recursos");
     }
 
     public void ejecutarMenuRecursos() throws RecursoNoEncontradoException {
@@ -181,7 +189,7 @@ public class CLI {
                     if (tipoRecursoInput == 5) break;
 
                     TipoRecurso tipoRecurso = null;
-                    switch(tipoRecursoInput) {
+                    switch (tipoRecursoInput) {
                         case 1:
                             tipoRecurso = TipoRecurso.AUDIOLIBRO;
                             break;
@@ -230,10 +238,10 @@ public class CLI {
 
                 case 2:
                     System.out.println("Eliminar Recurso");
+
                     System.out.print("Ingrese el título del recurso a eliminar: ");
                     String tituloEliminar = scanner.nextLine();
-                    System.out.print("Ingrese el autor del recurso a eliminar: ");
-                    String autorEliminar = scanner.nextLine();
+
                     try {
                         gestorRecursos.eliminarRecurso(tituloEliminar);
                         System.out.println("Recurso eliminado exitosamente.");
@@ -243,7 +251,7 @@ public class CLI {
                     break;
 
                 case 3:
-                    System.out.println("=== Buscar recurso por título y/o autor ===");
+                    System.out.println("Buscar recurso por título y/o autor");
 
                     System.out.print("Ingrese título (o deje vacío para ignorar): ");
                     titulo = scanner.nextLine().trim();
@@ -263,108 +271,8 @@ public class CLI {
                         System.out.println(e.getMessage());
                     }
                     break;
+
                 case 4:
-                    System.out.println("Prestar recurso \nSeleccione el recurso que desea prestar: ");
-                    System.out.println("1. Audiolibro");
-                    System.out.println("2. Ensayo");
-                    System.out.println("3. Libro");
-                    System.out.println("4. Revista");
-                    System.out.println("5. Volver al menu de recursos");
-
-                    int tipoPrestable = scanner.nextInt();
-                    scanner.nextLine();
-                    if (tipoPrestable == 5) break;
-
-                    try {
-                        System.out.println("Ingrese el ID del usuario: ");
-                        String idUsuario = scanner.nextLine();
-                        Usuario usuario = gestorUsuarios.buscarUsuario(idUsuario);
-                        if (usuario == null) {
-                            System.out.println("Usuario no encontrado.");
-                            break;
-                        }
-
-                        System.out.println("Ingrese el titulo del recurso: ");
-                        titulo = scanner.nextLine();
-
-                        System.out.println("Ingrese el autor del recurso: ");
-                        autor = scanner.nextLine();
-
-                        RecursoDigital recurso = gestorRecursos.buscarRecurso(titulo, autor);
-
-                        if (recurso == null) {
-                            System.out.println("Recurso no encontrado.");
-                            break;
-                        }
-
-                        System.out.println("Ingrese la fecha de inicio del préstamo (YYYY-MM-DD):");
-                        LocalDate fechaInicio = LocalDate.parse(scanner.nextLine());
-
-                        System.out.println("Ingrese la fecha de fin del préstamo (YYYY-MM-DD):");
-                        LocalDate fechaFin = LocalDate.parse(scanner.nextLine());
-
-                        gestorPrestamos.prestarRecurso(usuario, recurso, fechaInicio, fechaFin);
-                        System.out.println("¡Préstamo registrado con éxito!");
-
-                    } catch (DateTimeParseException e) {
-                            System.out.println("Formato de fecha inválido. Use el formato YYYY-MM-DD.");
-                    } catch (RecursoNoDisponibleException e) {
-                            System.out.println("Error al realizar el préstamo: " + e.getMessage());
-                    }
-                    break;
-
-                case 5:
-                    System.out.println("Devolver recurso:");
-                    try {
-                        System.out.print("Ingrese el título del recurso: ");
-                        String tituloDev = scanner.nextLine();
-
-                        System.out.print("Ingrese el autor del recurso: ");
-                        String autorDev = scanner.nextLine();
-
-                        RecursoDigital recursoDev = gestorRecursos.buscarRecurso(tituloDev, autorDev);
-
-                        if (recursoDev == null) {
-                            System.out.println("Recurso no encontrado.");
-                            break;
-                        }
-
-                        gestorPrestamos.devolverRecurso(recursoDev);
-                        System.out.println("Recurso devuelto correctamente.");
-
-                    } catch (RecursoNoDisponibleException e) {
-                        System.out.println("Error al devolver: " + e.getMessage());
-                    }
-                    break;
-                case 6:
-                    System.out.println("Renovar recurso:");
-                    try {
-                        System.out.print("Ingrese el título del recurso: ");
-                        String tituloRenovar = scanner.nextLine();
-
-                        System.out.print("Ingrese el autor del recurso: ");
-                        String autorRenovar = scanner.nextLine();
-
-                        RecursoDigital recursoRenovar = gestorRecursos.buscarRecurso(tituloRenovar, autorRenovar);
-
-                        if (recursoRenovar == null) {
-                            System.out.println("Recurso no encontrado.");
-                            break;
-                        }
-                        gestorRecursos.renovarRecurso(recursoRenovar);
-                        System.out.println("Recurso renovado correctamente.");
-
-                    } catch (RecursoNoDisponibleException e) {
-                        System.out.println("Error al renovar: " + e.getMessage());
-                    }
-                    break;
-
-                case 7:
-                    System.out.println("Volver al Menú Principal");
-                    ejecutarMenuPrincipal();
-                    break;
-
-                case 8:
                     System.out.println("Listado de Recursos:");
                     List<RecursoDigital> recursos = gestorRecursos.mostrarRecursos();
 
@@ -378,7 +286,7 @@ public class CLI {
                     }
                     break;
 
-                case 9:
+                case 5:
                     System.out.println("Mostrar recursos por tipo");
                     System.out.println("Seleccione el tipo de recurso que desea ver:");
                     System.out.println("1. Audiolibro");
@@ -415,7 +323,7 @@ public class CLI {
                         mostrarRecursosPorTipo(tipoRecursoFiltro);
                     }
                     break;
-                case 10:
+                case 6:
                     System.out.println("Seleccione el criterio de ordenamiento:");
                     System.out.println("1. Por título");
                     System.out.println("2. Por autor");
@@ -439,7 +347,6 @@ public class CLI {
                             System.out.println("Opción inválida.");
                             continue;
                     }
-
                     System.out.println("Recursos ordenados:");
                     for (RecursoDigital recurso : listaOrdenada) {
                         recurso.mostrarInformacion();
@@ -447,11 +354,16 @@ public class CLI {
                     }
                     break;
 
+                case 7:
+                    System.out.println("Volver al Menú Principal");
+                    ejecutarMenuPrincipal();
+                    break;
                 default:
                     System.out.println("Opción inválida. Intente nuevamente");
             }
         } while (opcion != 7);
     }
+
     public void mostrarRecursosPorTipo(TipoRecurso tipoRecurso) {
         List<RecursoDigital> recursosFiltrados = gestorRecursos.filtrarPorTipo(tipoRecurso);
 
@@ -459,9 +371,255 @@ public class CLI {
             System.out.println("No se encontraron recursos de tipo " + tipoRecurso);
         } else {
             for (RecursoDigital recurso : recursosFiltrados) {
-                recurso.mostrarInformacion();  // Muestra la información del recurso
+                recurso.mostrarInformacion();
                 System.out.println("----------------------------");
             }
         }
+    }
+
+    public void mostrarMenuPrestamos() {
+        System.out.println("A través de este menu podrá gestionar los préstamos y renovaciones de la biblioteca! \nSeleccione una opcion para continuar: ");
+        System.out.println("1. Prestar un recurso");
+        System.out.println("2. Devolver un recurso");
+        System.out.println("3. Renovar un recurso");
+        System.out.println("4. Mostrar los préstamos");
+        System.out.println("5. Volver al menu principal");
+    }
+
+    public void ejecutarMenuPrestamos() {
+        int opcion;
+        do {
+            mostrarMenuPrestamos();
+            opcion = scanner.nextInt();
+            scanner.nextLine();
+            String titulo;
+            String autor;
+
+            switch (opcion) {
+                case 1:
+                    System.out.println("Prestar recurso \nSeleccione el recurso que desea prestar: ");
+                    System.out.println("1. Audiolibro");
+                    System.out.println("2. Ensayo");
+                    System.out.println("3. Libro");
+                    System.out.println("4. Revista");
+                    System.out.println("5. Volver al menu de recursos");
+
+                    int tipoPrestable = scanner.nextInt();
+                    scanner.nextLine();
+                    if (tipoPrestable == 5) break;
+
+                    try {
+                        System.out.println("Ingrese el ID del usuario: ");
+                        String idUsuario = scanner.nextLine();
+
+                        Usuario usuario = gestorUsuarios.buscarUsuario(idUsuario);
+                        if (usuario == null) {
+                            System.out.println("Usuario no encontrado.");
+                            break;
+                        }
+
+                        System.out.println("Ingrese el titulo del recurso: ");
+                        titulo = scanner.nextLine();
+
+                        System.out.println("Ingrese el autor del recurso: ");
+                        autor = scanner.nextLine();
+
+                        RecursoDigital recurso = gestorRecursos.buscarRecurso(titulo, autor);
+
+                        if (recurso == null) {
+                            System.out.println("Recurso no encontrado.");
+                            break;
+                        }
+
+                        if (recurso.getEstado() != EstadoRecurso.DISPONIBLE) {
+                            System.out.println("El recurso no está disponible actualmente.");
+                            System.out.print("¿Desea reservarlo para una fecha futura? (s/n): ");
+                            String respuesta = scanner.nextLine().trim().toLowerCase();
+
+                            if (respuesta.equals("s")) {
+                                System.out.print("Ingrese la fecha deseada para la reserva (YYYY-MM-DD): ");
+                                String fechaStr = scanner.nextLine();
+                                try {
+                                    LocalDate fechaReserva = LocalDate.parse(fechaStr);
+                                    Reserva nuevaReserva = new Reserva(usuario, recurso, fechaReserva);
+                                    gestorReservas.agregarReserva(nuevaReserva);
+                                    System.out.println("Reserva realizada para la fecha " + fechaReserva + "!");
+                                } catch (DateTimeParseException e) {
+                                    System.out.println("Fecha inválida. Reserva no realizada.");
+                                }
+                            } else {
+                                System.out.println("Reserva cancelada.");
+                            }
+                            break;
+                        }
+
+                        System.out.println("Ingrese la fecha de inicio del préstamo (YYYY-MM-DD):");
+                        LocalDate fechaInicio = LocalDate.parse(scanner.nextLine());
+
+                        System.out.println("Ingrese la fecha de fin del préstamo (YYYY-MM-DD):");
+                        LocalDate fechaFin = LocalDate.parse(scanner.nextLine());
+
+                        gestorPrestamos.prestarRecurso(usuario, recurso, fechaInicio, fechaFin);
+                        System.out.println("¡Préstamo registrado con éxito!");
+
+                    } catch (DateTimeParseException e) {
+                        System.out.println("Formato de fecha inválido. Use el formato YYYY-MM-DD.");
+                    } catch (RecursoNoDisponibleException e) {
+                        System.out.println("Error al realizar el préstamo: " + e.getMessage());
+                    }
+                    break;
+
+                case 2:
+                    System.out.println("Devolver recurso:");
+                    try {
+                        System.out.println("Ingrese el ID del usuario que realizó el préstamo: ");
+                        String idUsuario = scanner.nextLine();
+
+                        Usuario usuarioDevuelve = gestorUsuarios.buscarUsuario(idUsuario);
+                        if (usuarioDevuelve == null) {
+                            System.out.println("Usuario no encontrado.");
+                            break;
+                        }
+
+                        System.out.print("Ingrese el título del recurso: ");
+                        String tituloDev = scanner.nextLine();
+
+                        System.out.print("Ingrese el autor del recurso: ");
+                        String autorDev = scanner.nextLine();
+
+                        RecursoDigital recursoDev = gestorRecursos.buscarRecurso(tituloDev, autorDev);
+
+                        if (recursoDev == null) {
+                            System.out.println("Recurso no encontrado.");
+                            break;
+                        }
+
+                        gestorPrestamos.devolverRecurso(recursoDev, idUsuario);
+                        System.out.println("Recurso devuelto correctamente.");
+
+                        gestorReservas.asignarReservaSiExiste(recursoDev, gestorPrestamos.getPrestamos());
+
+
+                    } catch (RecursoNoDisponibleException e) {
+                        System.out.println("Error al devolver: " + e.getMessage());
+                    }
+                    break;
+
+                case 3:
+                    System.out.println("Renovar recurso:");
+                    try {
+                        System.out.print("Ingrese el título del recurso: ");
+                        String tituloRenovar = scanner.nextLine();
+
+                        System.out.print("Ingrese el autor del recurso: ");
+                        String autorRenovar = scanner.nextLine();
+
+                        RecursoDigital recursoRenovar = gestorRecursos.buscarRecurso(tituloRenovar, autorRenovar);
+
+                        if (recursoRenovar == null) {
+                            System.out.println("Recurso no encontrado.");
+                            break;
+                        }
+                        gestorRecursos.renovarRecurso(recursoRenovar);
+                        System.out.println("Recurso renovado correctamente.");
+
+                    } catch (RecursoNoDisponibleException e) {
+                        System.out.println("Error al renovar: " + e.getMessage());
+                    }
+                    break;
+
+                case 4:
+                    System.out.println("Lista de préstamos");
+                    List<Prestamo> prestamos = gestorPrestamos.mostrarPrestamos();
+                    if (prestamos == null || prestamos.isEmpty()) {
+                        System.out.println("No hay préstamos registrados");
+                    } else {
+                        for (Prestamo prestamo : prestamos) {
+                            prestamo.mostrarInformacion();
+                            System.out.println("----------------------------");
+                        }
+                    }
+                    break;
+                case 5:
+                    mostrarMenuPrincipal();
+                    break;
+                default:
+                    System.out.println("Opción inválida. Intente nuevamente");
+            }
+        } while (opcion != 5);
+    }
+
+    public void mostrarMenuReservas() {
+        System.out.println("A través de este menu podrá gestionar las reservas de la biblioteca! \nSeleccione una opcion para continuar: ");
+        System.out.println("1. Reservar un recurso");
+        System.out.println("2. Ver reservas pendientes");
+        System.out.println("3. Volver al menu principal");
+    }
+
+    public void ejecutarMenuReservas() {
+        int opcion;
+        do {
+            mostrarMenuReservas();
+            opcion = scanner.nextInt();
+            scanner.nextLine();
+
+            String titulo;
+            String autor;
+
+            switch (opcion) {
+                case 1:
+                    System.out.println("Reservar un recurso");
+                    try {
+                        System.out.print("Ingrese el ID del usuario: ");
+                        String idUsuario = scanner.nextLine();
+
+                        Usuario usuario = gestorUsuarios.buscarUsuario(idUsuario);
+                        if (usuario == null) {
+                            System.out.println("Usuario no encontrado.");
+                            break;
+                        }
+
+                        System.out.print("Ingrese el título del recurso: ");
+                        titulo = scanner.nextLine();
+
+                        System.out.print("Ingrese el autor del recurso: ");
+                        autor = scanner.nextLine();
+
+                        RecursoDigital recurso = gestorRecursos.buscarRecurso(titulo, autor);
+                        if (recurso == null) {
+                            System.out.println("Recurso no encontrado.");
+                            break;
+                        }
+
+                        gestorReservas.realizarReserva(usuario, recurso);
+                        System.out.println("¡Reserva realizada con éxito!");
+
+                    } catch (Exception e) {
+                        System.out.println("Error al realizar la reserva: " + e.getMessage());
+                    }
+                    break;
+
+                case 2:
+                    System.out.println("Reservas pendientes:");
+                    List<Reserva> pendientes = gestorReservas.obtenerReservasPendientes(); // revisar,devuelve objeto
+
+                    if (pendientes.isEmpty()) {
+                        System.out.println("No hay reservas pendientes.");
+                    } else {
+                        for (Reserva r : pendientes) {
+                            System.out.println("Usuario: " + r.getUsuario().getNombre());
+                            System.out.println("Recurso: " + r.getRecursoDigital().getTitulo());
+                            System.out.println("Fecha de reserva: " + r.getFechaReserva());
+                            System.out.println("----------------------------");
+                        }
+                    }
+                    break;
+                case 3:
+                    mostrarMenuPrincipal();
+                    break;
+                default:
+                    System.out.println("Opción inválida. Intente nuevamente");
+            }
+        } while (opcion != 3);
     }
 }
