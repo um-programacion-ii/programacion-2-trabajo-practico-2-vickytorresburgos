@@ -1,12 +1,14 @@
 import console.CLI;
 import exceptions.RecursoNoEncontradoException;
+
 import gestores.GestorPrestamos;
 import gestores.GestorRecursos;
+import gestores.GestorReservas;
 import gestores.GestorUsuarios;
+
 import services.NotificacionesService;
 import services.NotificacionesServiceEmail;
 import services.NotificacionesServiceSMS;
-
 
 import java.util.Scanner;
 
@@ -18,11 +20,19 @@ public class Main {
 
         GestorUsuarios gestorUsuarios = new GestorUsuarios();
         GestorRecursos gestorRecursos = new GestorRecursos();
-        GestorPrestamos gestorPrestamos = new GestorPrestamos();
+        GestorReservas gestorReservas = new GestorReservas();
+        GestorPrestamos gestorPrestamos = new GestorPrestamos(gestorReservas);
+
         Scanner scanner = new Scanner(System.in);
 
-        CLI cli = new CLI(gestorUsuarios, gestorRecursos, scanner, notificacionesServiceEmail, notificacionesServiceSMS,gestorPrestamos);
-
+        CLI cli = new CLI(
+                gestorUsuarios,
+                gestorRecursos,
+                scanner,
+                notificacionesServiceEmail,
+                notificacionesServiceSMS,
+                gestorPrestamos,
+                gestorReservas);
         cli.ejecutarMenuPrincipal();
         scanner.close();
     }
