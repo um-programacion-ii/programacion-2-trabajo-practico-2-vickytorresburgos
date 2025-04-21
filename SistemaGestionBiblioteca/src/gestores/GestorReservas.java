@@ -7,8 +7,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.PriorityBlockingQueue;
 
+import services.NotificacionesService;
+
 public class GestorReservas {
     private PriorityBlockingQueue<Reserva> colaReservas = new PriorityBlockingQueue<>();
+
+    private GestorNotificaciones gestorNotificaciones;
+    private NotificacionesService servicioNotificaciones;
+
+    public GestorReservas(GestorNotificaciones gestorNotificaciones, NotificacionesService servicioNotificaciones) {
+        this.gestorNotificaciones = gestorNotificaciones;
+        this.servicioNotificaciones = servicioNotificaciones;
+    }
 
     public void agregarReserva(Reserva reserva) {
         colaReservas.offer(reserva);
@@ -33,8 +43,12 @@ public class GestorReservas {
         Reserva proximaReserva = obtenerProximaReserva(recurso);
 
         if (proximaReserva != null) {
+            String destino = proximaReserva.getUsuario().getEmail();
+            String mensaje = "Tu reserva del recurso: " + recurso.getTitulo() + " ya esta disponible";
+            gestorNotificaciones.enviar(servicioNotificaciones, destino, mensaje);
+
             recurso.setEstado(EstadoRecurso.PRESTADO);
-            System.out.println("El recurso fue asignado automáticamente a:");
+            System.out.println("El recurso fue asignado automáticamente a: ");
             System.out.println("-> Usuario: " + proximaReserva.getUsuario().getNombre());
             System.out.println("Válido desde " + LocalDate.now() + " hasta " + LocalDate.now().plusDays(7));
 
@@ -46,6 +60,8 @@ public class GestorReservas {
             );
             prestamos.add(nuevoPrestamo);
             System.out.println("Préstamo automático registrado desde reserva.");
+
+
         }
     }
 
