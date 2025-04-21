@@ -2,17 +2,20 @@ package gestores;
 
 import exceptions.RecursoNoDisponibleException;
 import interfaces.Prestable;
-import models.EstadoRecurso;
-import models.Prestamo;
-import models.RecursoDigital;
-import models.Usuario;
+import models.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 public class GestorPrestamos {
-    private final List<Prestamo> prestamos = new ArrayList<>();
+    private List<Prestamo> prestamos = new ArrayList<>();
+    private GestorReservas gestorReservas;
+
+    public GestorPrestamos(GestorReservas gestorReservas) {
+        this.gestorReservas = gestorReservas;
+        this.prestamos = new ArrayList<>();
+    }
 
     public void prestarRecurso(Usuario usuario, RecursoDigital recursoDigital, LocalDate fechaInicio, LocalDate fechaFin) {
         if (!recursoDigital.estaDisponible()) {
@@ -29,22 +32,70 @@ public class GestorPrestamos {
         prestamos.add(prestamo);
     }
 
-    public void devolverRecurso(RecursoDigital recursoDigital) {
-        recursoDigital.setEstado(EstadoRecurso.DISPONIBLE);
-        prestamos.removeIf(prestamo -> prestamo.getRecursoDigital().equals(recursoDigital));
+    public void devolverRecurso(RecursoDigital recurso, String idUsuario) throws RecursoNoDisponibleException {
+        validarEstadoPrestado(recurso);
+
+        Prestamo prestamoActivo = obtenerPrestamoActivo(recurso);
+        if (prestamoActivo == null) {
+            System.out.println("No se encontró un préstamo activo para este recurso.");
+            return;
+        }
+
+        if (!prestamoActivo.getUsuario().getId().equals(idUsuario)) {
+            System.out.println("Solo el usuario que tomó el préstamo puede devolver este recurso.");
+            return;
+        }
+
+        prestamos.remove(prestamoActivo);
+        recurso.setEstado(EstadoRecurso.DISPONIBLE);
+        System.out.println("Recurso devuelto correctamente.");
+
+        if (gestorReservas != null) {
+            gestorReservas.asignarReservaSiExiste(recurso, prestamos);
+        }
     }
 
-    public void mostrarPrestamos() {
-        if (prestamos.isEmpty()) {
-            throw new RuntimeException();
+    public List<Prestamo> getPrestamos() {
+        return prestamos;
+    }
+
+    private void validarEstadoPrestado(RecursoDigital recurso) throws RecursoNoDisponibleException {
+        if (recurso.getEstado() != EstadoRecurso.PRESTADO) {
+            throw new RecursoNoDisponibleException("El recurso no está actualmente prestado.");
         }
-        else {
-            for(Prestamo prestamo : prestamos) {
-                System.out.println("- Usuario: " + prestamo.getUsuario());
-                System.out.println("- Recurso: " + prestamo.getRecursoDigital().getTitulo());
-                System.out.println("- Desde: " + prestamo.getFechaInicio());
-                System.out.println("- Hasta: " + prestamo.getFechaFin());
+    }
+
+    private Prestamo obtenerPrestamoActivo(RecursoDigital recurso) {
+        for (Prestamo p : prestamos) {
+            if (p.getRecursoDigital().equals(recurso)) {
+                return p;
             }
         }
+        return null;
+    }
+
+    private void manejarReservaPosterior(RecursoDigital recurso) {
+        if (gestorReservas == null) return;
+
+        Reserva proximaReserva = gestorReservas.obtenerProximaReserva(recurso);
+        if (proximaReserva != null) {
+            recurso.setEstado(EstadoRecurso.PRESTADO);
+            System.out.println("El recurso fue asignado automáticamente a:");
+            System.out.println("-> Usuario: " + proximaReserva.getUsuario().getNombre());
+
+            Prestamo nuevoPrestamo = new Prestamo(
+                    proximaReserva.getUsuario(),
+                    recurso,
+                    LocalDate.now(),
+                    LocalDate.now().plusDays(7)
+            );
+            prestamos.add(nuevoPrestamo);
+            System.out.println("Préstamo automático registrado desde reserva.");
+        }
+    }
+
+
+    public List<Prestamo> mostrarPrestamos() {
+        return prestamos;
     }
 }
