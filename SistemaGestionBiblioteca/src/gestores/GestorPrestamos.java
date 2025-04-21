@@ -74,26 +74,6 @@ public class GestorPrestamos {
         return null;
     }
 
-    private void manejarReservaPosterior(RecursoDigital recurso) {
-        if (gestorReservas == null) return;
-
-        Reserva proximaReserva = gestorReservas.obtenerProximaReserva(recurso);
-        if (proximaReserva != null) {
-            recurso.setEstado(EstadoRecurso.PRESTADO);
-            System.out.println("El recurso fue asignado automáticamente a:");
-            System.out.println("-> Usuario: " + proximaReserva.getUsuario().getNombre());
-
-            Prestamo nuevoPrestamo = new Prestamo(
-                    proximaReserva.getUsuario(),
-                    recurso,
-                    LocalDate.now(),
-                    LocalDate.now().plusDays(7)
-            );
-            prestamos.add(nuevoPrestamo);
-            System.out.println("Préstamo automático registrado desde reserva.");
-        }
-    }
-
 
     public List<Prestamo> mostrarPrestamos() {
         return prestamos;
