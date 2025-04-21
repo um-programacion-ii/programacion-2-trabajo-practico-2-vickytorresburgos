@@ -69,29 +69,6 @@ public class GestorRecursos {
         return recursos;
     }
 
-    public void prestarRecurso(RecursoDigital recurso) {
-        if (!(recurso instanceof Prestable)) {
-            throw new RecursoNoDisponibleException("El recurso no es prestable.");
-        }
-        if (!recurso.estaDisponible()) {
-            throw new RecursoNoDisponibleException("El recurso no está disponible para préstamo.");
-        }
-        ((Prestable) recurso).prestar();
-        recurso.setDisponible(false);
-    }
-
-
-    public void devolverRecurso(RecursoDigital recurso) throws RecursoNoDisponibleException {
-        if (!(recurso instanceof Prestable)) {
-            throw new RecursoNoDisponibleException("El recurso no es devolvible porque no es prestable.");
-        }
-        if (recurso.estaDisponible()) {
-            throw new RecursoNoDisponibleException("El recurso ya está disponible, no se puede devolver.");
-        }
-        ((Prestable) recurso).devolver();
-        recurso.setDisponible(true);
-    }
-
 
     public void renovarRecurso(RecursoDigital recurso) throws RecursoNoDisponibleException {
         if (!(recurso instanceof Renovable)) {
