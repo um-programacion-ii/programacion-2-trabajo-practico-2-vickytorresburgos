@@ -10,18 +10,23 @@ import java.util.List;
 
 public class GestorPrestamos {
     private List<Prestamo> prestamos = new ArrayList<>();
-    private GestorReservas gestorReservas;
+    private final GestorReservas gestorReservas;
 
     public GestorPrestamos(GestorReservas gestorReservas) {
         this.gestorReservas = gestorReservas;
         this.prestamos = new ArrayList<>();
     }
 
-    public void prestarRecurso(Usuario usuario, RecursoDigital recursoDigital, LocalDate fechaInicio, LocalDate fechaFin) {
+    public synchronized void prestarRecurso(Usuario usuario, RecursoDigital recursoDigital, LocalDate fechaInicio, LocalDate fechaFin) {
+        System.out.println("[" + Thread.currentThread().getName() + "] Intentando prestar: " + recursoDigital.getTitulo());
+
         if (!recursoDigital.estaDisponible()) {
+            System.out.println("[" + Thread.currentThread().getName() + "] Recurso no disponible.");
             throw new RecursoNoDisponibleException("El recurso no está disponible.");
         }
+
         if (!(recursoDigital instanceof Prestable)) {
+            System.out.println("[" + Thread.currentThread().getName() + "] Recurso no es prestable.");
             throw new RecursoNoDisponibleException("El recurso no es prestable.");
         }
 
@@ -30,7 +35,10 @@ public class GestorPrestamos {
 
         Prestamo prestamo = new Prestamo(usuario, recursoDigital, fechaInicio, fechaFin);
         prestamos.add(prestamo);
+        System.out.println("[" + Thread.currentThread().getName() + "] Préstamo completado.");
+
     }
+
 
     public void devolverRecurso(RecursoDigital recurso, String idUsuario) throws RecursoNoDisponibleException {
         validarEstadoPrestado(recurso);
