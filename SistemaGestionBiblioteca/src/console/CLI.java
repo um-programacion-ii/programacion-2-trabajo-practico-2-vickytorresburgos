@@ -7,12 +7,13 @@ import comparadores.ComparadorTitulo;
 import exceptions.RecursoNoDisponibleException;
 import exceptions.RecursoNoEncontradoException;
 import exceptions.UsuarioNoEncontradoException;
-import gestores.GestorReservas;
 import models.*;
 
 import gestores.GestorRecursos;
 import gestores.GestorUsuarios;
 import gestores.GestorPrestamos;
+import gestores.GestorReservas;
+import gestores.GestorReportes;
 
 import services.NotificacionesService;
 
@@ -40,13 +41,18 @@ public class CLI {
         this.scanner = new Scanner(System.in);
     }
 
+    private GestorReportes crearGestorReportes() {
+        return new GestorReportes(gestorPrestamos.getPrestamos());
+    }
+
     public void mostrarMenuPrincipal() {
         System.out.println("Bienvenido a la biblioteca digital de la UM! \nSeleccione una opción para continuar: ");
         System.out.println("1. Gestión de Usuarios");
         System.out.println("2. Gestión de Recursos");
         System.out.println("3. Gestión de Préstamos");
         System.out.println("4. Gestión de Reservas");
-        System.out.println("5. Salir");
+        System.out.println("5. Reportes");
+        System.out.println("6. Salir");
     }
 
     public void ejecutarMenuPrincipal() throws RecursoNoEncontradoException {
@@ -70,12 +76,16 @@ public class CLI {
                     ejecutarMenuReservas();
                     break;
                 case 5:
+                    System.out.println("Reportes del sistema");
+                    crearGestorReportes().mostrarReportes();
+                    break;
+                case 6:
                     System.out.println("Saliendo de la biblioteca digital...");
                     break;
                 default:
                     System.out.println("Opción inválida. Intente nuevamente.");
             }
-        } while (opcion != 5);
+        } while (opcion != 6);
         scanner.close();
     }
 
@@ -84,8 +94,9 @@ public class CLI {
         System.out.println("1. Agregar Usuario");
         System.out.println("2. Eliminar Usuario");
         System.out.println("3. Buscar Usuario");
-        System.out.println("4. Volver al Menú Principal");
-        System.out.println("5. Mostrar lista de usuarios");
+        System.out.println("4. Mostrar lista de usuarios");
+        System.out.println("5. Reporte de usuarios más activos");
+        System.out.println("6. Volver al Menú Principal");
     }
 
     public void ejecutarMenuUsuarios() throws RecursoNoEncontradoException {
@@ -117,7 +128,6 @@ public class CLI {
                         System.out.println("Error al agregar al usuario: " + e.getMessage());
                     }
                     break;
-
                 case 2:
                     System.out.println("Eliminar Usuario");
                     System.out.println("Ingrese el ID del usuario: ");
@@ -128,7 +138,6 @@ public class CLI {
                     System.out.println("Buscar Usuario");
                     System.out.println("Ingrese el ID del usuario: ");
                     String idBuscar = scanner.nextLine();
-
                     try {
                         Usuario usuario = gestorUsuarios.buscarUsuario(idBuscar);
                         System.out.println("Usuario encontrado:");
@@ -141,17 +150,25 @@ public class CLI {
                     }
                     break;
                 case 4:
-                    System.out.println("Volver al Menú Principal");
-                    ejecutarMenuPrincipal();
-                    break;
-                case 5:
                     System.out.println("Lista de usuarios: ");
                     gestorUsuarios.mostrarUsuarios();
+                    break;
+                case 5:
+                    System.out.println("Reporte de usuarios msá activos");
+                    try {
+                        crearGestorReportes().reporteUsuariosMasActivos();
+                    } catch (IllegalArgumentException e) {
+                        System.out.println(e.getMessage());
+                    }
+                    break;
+                case 6:
+                    System.out.println("Volver al Menú Principal");
+                    ejecutarMenuPrincipal();
                     break;
                 default:
                     System.out.println("Opción inválida. Intente nuevamente");
             }
-        } while (opcion != 4);
+        } while (opcion != 6);
     }
 
     public void mostrarMenuRecursos() {
@@ -383,7 +400,9 @@ public class CLI {
         System.out.println("2. Devolver un recurso");
         System.out.println("3. Renovar un recurso");
         System.out.println("4. Mostrar los préstamos");
-        System.out.println("5. Volver al menu principal");
+        System.out.println("5. Reporte de préstamos por categoria");
+        System.out.println("6. Reportes de préstamos");
+        System.out.println("7. Volver al menu principal");
     }
 
     public void ejecutarMenuPrestamos() {
@@ -503,7 +522,6 @@ public class CLI {
                         System.out.println("Error al devolver: " + e.getMessage());
                     }
                     break;
-
                 case 3:
                     System.out.println("Renovar recurso:");
                     try {
@@ -526,7 +544,6 @@ public class CLI {
                         System.out.println("Error al renovar: " + e.getMessage());
                     }
                     break;
-
                 case 4:
                     System.out.println("Lista de préstamos");
                     List<Prestamo> prestamos = gestorPrestamos.mostrarPrestamos();
@@ -540,12 +557,31 @@ public class CLI {
                     }
                     break;
                 case 5:
+                    System.out.println("Reporte de préstamos por categoria");
+                    try {
+                        crearGestorReportes().estadisticasPorCategoria();
+                    } catch (IllegalArgumentException e) {
+                        System.out.println(
+                                e.getMessage()
+                        );
+                    }
+                    break;
+                case 6:
+                    System.out.println("Reporte de préstamos");
+                    try {
+                        crearGestorReportes().reporteRecursosMasPrestados();
+                    } catch (IllegalArgumentException e) {
+                        System.out.println(e.getMessage()
+                        );
+                    }
+                    break;
+                case 7:
                     mostrarMenuPrincipal();
                     break;
                 default:
                     System.out.println("Opción inválida. Intente nuevamente");
             }
-        } while (opcion != 5);
+        } while (opcion != 7);
     }
 
     public void mostrarMenuReservas() {

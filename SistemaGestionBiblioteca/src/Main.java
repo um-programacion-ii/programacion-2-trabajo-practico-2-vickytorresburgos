@@ -20,7 +20,6 @@ public class Main {
         NotificacionesService notificacionesServiceSMS = new NotificacionesServiceSMS();
         GestorNotificaciones gestorNotificaciones = new GestorNotificaciones();
 
-
         GestorUsuarios gestorUsuarios = new GestorUsuarios();
         GestorRecursos gestorRecursos = new GestorRecursos();
         GestorReservas gestorReservas = new GestorReservas(gestorNotificaciones, notificacionesServiceEmail);
