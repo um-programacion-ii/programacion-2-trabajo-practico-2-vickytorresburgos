@@ -81,8 +81,16 @@ public class GestorPrestamos {
         return null;
     }
 
-
     public List<Prestamo> mostrarPrestamos() {
         return prestamos;
+    }
+
+    public boolean renovarPrestamoRecurso(Prestamo prestamo) {
+        if (prestamo != null && prestamo.getRecursoDigital().getEstado() == EstadoRecurso.PRESTADO) {
+            LocalDate nuevaFechaFin = LocalDate.now().plusDays(7);
+            prestamo.setFechaFin(nuevaFechaFin);
+            return true;
+        }
+        return false;
     }
 }

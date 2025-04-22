@@ -52,7 +52,8 @@ public class CLI {
         System.out.println("3. Gestión de Préstamos");
         System.out.println("4. Gestión de Reservas");
         System.out.println("5. Reportes");
-        System.out.println("6. Salir");
+        System.out.println("6. Ver Alertas de Vencimiento");
+        System.out.println("7. Salir");
     }
 
     public void ejecutarMenuPrincipal() throws RecursoNoEncontradoException {
@@ -80,12 +81,41 @@ public class CLI {
                     crearGestorReportes().mostrarReportes();
                     break;
                 case 6:
+                    System.out.println("Alertas de vencimiento");
+                    List<Prestamo> prestamos = gestorPrestamos.getPrestamos();
+                    AlertaVencimiento alerta = new AlertaVencimiento(prestamos);
+                    List<Prestamo> prestamosPorVencer = alerta.obtenerAlertasDeVencimiento();
+
+                    if (!prestamosPorVencer.isEmpty()) {
+                        for (Prestamo prestamo : prestamosPorVencer) {
+                            System.out.println("El préstamo del recurso '" + prestamo.getRecursoDigital().getTitulo() +
+                                    "' vence el " + prestamo.getFechaFin());
+
+                            System.out.print("¿Desea renovarlo? (s/n): ");
+                            String respuesta = scanner.nextLine();
+
+                            if (respuesta.equalsIgnoreCase("s")) {
+                                boolean renovado = gestorPrestamos.renovarPrestamoRecurso(prestamo);
+                                if (renovado) {
+                                    System.out.println("Préstamo renovado hasta: " + prestamo.getFechaFin());
+                                } else {
+                                    System.out.println("No se pudo renovar el préstamo.");
+                                }
+                            } else {
+                                System.out.println("No se realizó la renovación.");
+                            }
+                        }
+                    } else {
+                        System.out.println("No hay préstamos próximos a vencer.");
+                    }
+                    break;
+                case 7:
                     System.out.println("Saliendo de la biblioteca digital...");
                     break;
                 default:
                     System.out.println("Opción inválida. Intente nuevamente.");
             }
-        } while (opcion != 6);
+        } while (opcion != 7);
         scanner.close();
     }
 
@@ -154,7 +184,7 @@ public class CLI {
                     gestorUsuarios.mostrarUsuarios();
                     break;
                 case 5:
-                    System.out.println("Reporte de usuarios msá activos");
+                    System.out.println("Reporte de usuarios más activos");
                     try {
                         crearGestorReportes().reporteUsuariosMasActivos();
                     } catch (IllegalArgumentException e) {
