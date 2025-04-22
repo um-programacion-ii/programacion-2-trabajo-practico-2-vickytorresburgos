@@ -54,7 +54,6 @@ public class GestorPrestamos {
             return;
         }
 
-        prestamos.remove(prestamoActivo);
         recurso.setEstado(EstadoRecurso.DISPONIBLE);
         System.out.println("Recurso devuelto correctamente.");
 
