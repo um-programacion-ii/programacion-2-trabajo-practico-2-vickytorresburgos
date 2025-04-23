@@ -6,28 +6,117 @@
 Desarrollar un sistema de gestión de biblioteca digital que implemente los cinco principios SOLID, programación orientada a objetos, y conceptos avanzados de Java. El sistema deberá manejar diferentes tipos de recursos digitales, préstamos, reservas, y notificaciones en tiempo real.
 
 ## 👨‍🎓 Información del Alumno
-- **Nombre y Apellido**: [Nombre y Apellido del Alumno]
+- **Nombre y Apellido**: Maria Victoria Torres Burgos
 
 ## 📋 Requisitos Adicionales
 
 ### Documentación del Sistema
 Como parte del trabajo práctico, deberás incluir en este README una guía de uso que explique:
 
-1. **Cómo funciona el sistema**:
-   - Descripción general de la arquitectura
-   - Explicación de los componentes principales
+## Cómo Funciona el Sistema
+
+### Descripción General de la Arquitectura
+El sistema está basado en una arquitectura **MVC (Modelo-Vista-Controlador)**, donde:
+
+- **Modelo**: Incluye las clases que representan los datos del sistema, como `Usuario`, `RecursoDigital`, `Prestamo`, entre otras.
+- **Vista**: La interfaz de usuario es completamente interactiva a través de la terminal.
+- **Controlador**: Gestiona la lógica de negocio y maneja las interacciones entre los modelos y la vista. Cada funcionalidad del sistema está organizada en menús, como gestión de usuarios, recursos, préstamos, etc.
+
+### Componentes Principales
+
+- **Gestores**: Son clases que manejan la lógica de negocio, como `GestorUsuarios`, `GestorRecursos`, `GestorPrestamos`, `GestorReportes`, etc. Cada uno de estos gestores realiza operaciones específicas en su área (gestionar usuarios, recursos, generar reportes, etc.).
+
+- **Modelo de Datos**: Las clases `Usuario`, `RecursoDigital`, `Prestamo`, `Reserva`, entre otras, representan la información que se maneja en el sistema.
+
+- **Notificaciones**: El sistema envía notificaciones por **email** y **SMS** a los usuarios sobre cambios en sus reservas o préstamos. Esto es gestionado a través de servicios como `NotificacionesServiceEmail` y `NotificacionesServiceSMS`.
+
+- **Reportes**: El sistema permite generar reportes de los **recursos más prestados**, **usuarios más activos**, y **estadísticas por categoría**, todo ello de forma concurrente usando `ExecutorService` para tareas en segundo plano.
    - Flujo de trabajo del sistema
 
-2. **Cómo ponerlo en funcionamiento**:
-   - Deberás incluir las instrucciones detalladas de puesta en marcha
-   - Explicar los requisitos previos necesarios
-   - Describir el proceso de compilación
-   - Detallar cómo ejecutar la aplicación
+### Flujo de Trabajo del Sistema
 
-3. **Cómo probar cada aspecto desarrollado**:
-   - Deberás proporcionar ejemplos de uso para cada funcionalidad implementada
-   - Incluir casos de prueba que demuestren el funcionamiento del sistema
-   - Describir flujos de trabajo completos que muestren la interacción entre diferentes componentes
+1. **Inicio**: El sistema comienza con un menú principal donde el usuario puede elegir gestionar usuarios, recursos, préstamos, reservas, generar reportes, o salir de la aplicación.
+2. **Gestión de Usuarios**: Permite agregar, eliminar, buscar y listar usuarios registrados en el sistema.
+3. **Gestión de Recursos**: Aquí se pueden agregar y eliminar recursos como libros, revistas, y audiolibros.
+4. **Gestión de Préstamos y Reservas**: Los usuarios pueden realizar préstamos de recursos disponibles y hacer reservas si el recurso no está disponible en el momento.
+5. **Generación de Reportes**: Los reportes se generan en segundo plano y muestran estadísticas sobre los recursos más prestados, los usuarios más activos, y la distribución de préstamos por categorías.
+
+## Cómo Ponerlo en Funcionamiento
+
+### Requisitos Previos
+
+- **Java 8 o superior**: El sistema está desarrollado en Java, por lo que necesitas tener instalada la versión 8 o superior del JDK.
+- **IDE recomendado**: Puedes usar cualquier IDE para Java como IntelliJ IDEA, Eclipse o NetBeans.
+
+### Instrucciones de Instalación
+
+1. Clonar el repositorio:
+```bash
+git clone git@github.com:um-programacion-ii/programacion-2-trabajo-practico-2-vickytorresburgos.git
+```
+2. Navegar al repositorio y compilar
+```
+cd SistemaGestionBiblioteca
+javac src/*.java
+```
+3. Ejecutar el programa
+```
+java -cp src Main
+```
+O ejecutando la clase Main.java con tu IDE.
+
+2. **Menú Principal**
+
+   Una vez que la aplicación se ejecute, verás el menú principal en la consola. Aquí podrás interactuar con las diferentes funcionalidades del sistema, como la gestión de usuarios, recursos, préstamos, reservas, reportes, etc.
+
+## Cómo Probar Cada Aspecto Desarrollado
+
+### Ejemplos de Uso
+
+#### Gestión de Usuarios
+
+1. **Agregar un Usuario**:
+    - Selecciona la opción **1** en el menú de usuarios.
+    - Ingresa el nombre, email y teléfono del usuario, y elige el medio de notificación (Email/SMS).
+
+2. **Buscar un Usuario**:
+    - Selecciona la opción **3** en el menú de usuarios.
+    - Ingresa el ID del usuario para obtener la información del usuario (nombre, email, teléfono).
+
+#### Gestión de Recursos
+
+1. **Agregar un Recurso**:
+    - Selecciona la opción de agregar recurso en el menú correspondiente.
+    - El sistema te pedirá ingresar detalles como el título y tipo de recurso (libro, revista, audiolibro).
+
+2. **Listar Recursos**:
+    - Selecciona la opción correspondiente para listar todos los recursos disponibles en el sistema.
+
+#### Reportes
+
+1. **Reporte de Recursos Más Prestados**:
+    - Selecciona la opción de reporte y el sistema mostrará los 5 recursos más prestados.
+
+2. **Reporte de Usuarios Más Activos**:
+    - Selecciona la opción de reporte de usuarios más activos.
+
+### Casos de Prueba
+
+1. **Prueba de Gestión de Usuarios**:
+    - Crear un usuario, buscarlo, eliminarlo, y luego intentar buscarlo de nuevo para asegurar que fue eliminado correctamente.
+
+2. **Prueba de Gestión de Recursos**:
+    - Agregar un recurso, luego realizar un préstamo y verificar que el recurso esté marcado como prestado.
+
+3. **Prueba de Reportes**:
+    - Generar un reporte de los recursos más prestados y verificar que los resultados sean correctos.
+
+#### Flujo de Trabajo Completo
+
+1. **Agregar un Usuario**: Agregar un usuario con su información.
+2. **Agregar un Recurso**: Agregar un libro como recurso.
+3. **Realizar un Préstamo**: Hacer un préstamo de ese libro a un usuario.
+4. **Generar Reportes**: Generar un reporte de los recursos más prestados.
 
 La guía debe ser clara, concisa y permitir a cualquier usuario entender y probar el sistema. Se valorará especialmente:
 - La claridad de las instrucciones
