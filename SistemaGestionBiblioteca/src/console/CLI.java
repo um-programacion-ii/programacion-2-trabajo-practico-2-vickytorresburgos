@@ -4,6 +4,9 @@ import comparadores.ComparadorAutor;
 import comparadores.ComparadorRenovaciones;
 import comparadores.ComparadorTitulo;
 
+import enums.EstadoRecurso;
+import enums.NivelAlerta;
+import enums.TipoRecurso;
 import exceptions.RecursoNoDisponibleException;
 import exceptions.RecursoNoEncontradoException;
 import exceptions.UsuarioNoEncontradoException;
@@ -14,6 +17,7 @@ import gestores.GestorUsuarios;
 import gestores.GestorPrestamos;
 import gestores.GestorReservas;
 import gestores.GestorReportes;
+import gestores.GestorNotificaciones;
 
 import services.NotificacionesService;
 
@@ -30,14 +34,16 @@ public class CLI {
     private final NotificacionesService notificacionesServiceSMS;
     private final GestorPrestamos gestorPrestamos;
     private final GestorReservas gestorReservas;
+    private final GestorNotificaciones gestorNotificaciones;
 
-    public CLI(GestorUsuarios gestorUsuarios, GestorRecursos gestorRecursos, Scanner scanner, NotificacionesService notificacionesServiceEmail, NotificacionesService notificacionesServiceSMS, GestorPrestamos gestorPrestamos, GestorReservas gestorReservas) {
+    public CLI(GestorUsuarios gestorUsuarios, GestorRecursos gestorRecursos, Scanner scanner, NotificacionesService notificacionesServiceEmail, NotificacionesService notificacionesServiceSMS, GestorPrestamos gestorPrestamos, GestorReservas gestorReservas, GestorNotificaciones gestorNotificaciones) {
         this.gestorUsuarios = gestorUsuarios;
         this.gestorRecursos = gestorRecursos;
         this.notificacionesServiceEmail = notificacionesServiceEmail;
         this.notificacionesServiceSMS = notificacionesServiceSMS;
         this.gestorPrestamos = gestorPrestamos;
         this.gestorReservas = gestorReservas;
+        this.gestorNotificaciones = gestorNotificaciones;
         this.scanner = new Scanner(System.in);
     }
 
@@ -52,9 +58,8 @@ public class CLI {
         System.out.println("3. Gestión de Préstamos");
         System.out.println("4. Gestión de Reservas");
         System.out.println("5. Reportes");
-        System.out.println("6. Ver Alertas de Vencimiento");
-        System.out.println("7. Ver Alertas de Disponibilidad");
-        System.out.println("8. Salir");
+        System.out.println("6. Alertas");
+        System.out.println("7. Salir");
     }
 
     public void ejecutarMenuPrincipal() throws RecursoNoEncontradoException {
@@ -82,86 +87,15 @@ public class CLI {
                     crearGestorReportes().mostrarReportes();
                     break;
                 case 6:
-                    System.out.println("Alertas de vencimiento");
-                    List<Prestamo> prestamos = gestorPrestamos.getPrestamos();
-                    AlertaVencimiento alerta = new AlertaVencimiento(prestamos);
-                    List<Prestamo> prestamosPorVencer = alerta.obtenerAlertasDeVencimiento();
-
-                    if (!prestamosPorVencer.isEmpty()) {
-                        for (Prestamo prestamo : prestamosPorVencer) {
-                            System.out.println("El préstamo del recurso '" + prestamo.getRecursoDigital().getTitulo() +
-                                    "' vence el " + prestamo.getFechaFin());
-
-                            System.out.print("¿Desea renovarlo? (s/n): ");
-                            String respuesta = scanner.nextLine();
-
-                            if (respuesta.equalsIgnoreCase("s")) {
-                                boolean renovado = gestorPrestamos.renovarPrestamoRecurso(prestamo);
-                                if (renovado) {
-                                    System.out.println("Préstamo renovado hasta: " + prestamo.getFechaFin());
-                                } else {
-                                    System.out.println("No se pudo renovar el préstamo.");
-                                }
-                            } else {
-                                System.out.println("No se realizó la renovación.");
-                            }
-                        }
-                    } else {
-                        System.out.println("No hay préstamos próximos a vencer.");
-                    }
+                    ejecutarMenuAlertas();
                     break;
                 case 7:
-                    System.out.println("Notificaciones de disponibilidad:");
-                    List<Reserva> reservasPendientes = gestorReservas.obtenerReservasPendientes();
-                    AlertaDisponibilidad alertaDisp = new AlertaDisponibilidad(reservasPendientes);
-
-                    List<Reserva> disponibles = alertaDisp.obtenerReservasDisponibles();
-
-                    if (disponibles.isEmpty()) {
-                        System.out.println("No hay recursos reservados disponibles en este momento.");
-                    } else {
-                        for (Reserva reserva : disponibles) {
-                            RecursoDigital recurso = reserva.getRecursoDigital();
-
-                            System.out.println("El recurso '" + recurso.getTitulo() + " ya está disponible.");
-
-                            System.out.print("¿Desea realizar el préstamo ahora? (s/n): ");
-                            String respuesta = scanner.nextLine();
-
-                            if (respuesta.equalsIgnoreCase("s")) {
-
-                                System.out.println("Ingrese su ID de usuario: ");
-                                String idUsuario = scanner.nextLine();
-
-                                Usuario usuario = gestorUsuarios.buscarUsuario(idUsuario);
-                                if (usuario == null) {
-                                    System.out.println("Usuario no encontrado. Registrese para realizar el préstamo.");
-                                    continue;
-                                }
-
-                                System.out.println("Ingrese la fecha de inicio del préstamo (YYYY-MM-DD):");
-                                LocalDate fechaInicio = LocalDate.parse(scanner.nextLine());
-
-                                System.out.println("Ingrese la fecha de fin del préstamo (YYYY-MM-DD):");
-                                LocalDate fechaFin = LocalDate.parse(scanner.nextLine());
-
-                                gestorPrestamos.prestarRecurso(usuario, recurso, fechaInicio, fechaFin);
-                                gestorReservas.eliminarReserva(reserva);
-                                System.out.println("¡Préstamo registrado con éxito!");
-
-                            } else {
-                                System.out.println("No se realizó el préstamo.");
-                            }
-                        }
-                    }
-                    break;
-                case 8:
                     System.out.println("Saliendo de la biblioteca digital...");
                     break;
                 default:
                     System.out.println("Opción inválida. Intente nuevamente.");
             }
-        } while (opcion != 8);
+        } while (opcion != 7);
         scanner.close();
     }
 
@@ -732,5 +666,120 @@ public class CLI {
                     System.out.println("Opción inválida. Intente nuevamente");
             }
         } while (opcion != 3);
+    }
+
+    public void mostrarMenuAlertas() {
+        System.out.println("Alertas");
+        System.out.println("1. Alertas de Vencimiento");
+        System.out.println("2. Alertas de Disponibilidad");
+        System.out.println("3. Alertas y Recordatorios");
+        System.out.println("4. Configurar nivel minimo de alerta");
+        System.out.println("5. Volver al Menú Principal");
+    }
+
+    public void ejecutarMenuAlertas() throws RecursoNoEncontradoException {
+        int opcion;
+        do {
+            mostrarMenuAlertas();
+            opcion = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (opcion) {
+                case 1:
+                    System.out.println("Alertas de vencimiento");
+                    List<Prestamo> prestamos = gestorPrestamos.getPrestamos();
+                    AlertaVencimiento alerta = new AlertaVencimiento(prestamos);
+                    List<Prestamo> prestamosPorVencer = alerta.obtenerAlertasDeVencimiento();
+
+                    if (!prestamosPorVencer.isEmpty()) {
+                        for (Prestamo prestamo : prestamosPorVencer) {
+                            System.out.println("El préstamo del recurso '" + prestamo.getRecursoDigital().getTitulo() +
+                                    "' vence el " + prestamo.getFechaFin());
+
+                            System.out.print("¿Desea renovarlo? (s/n): ");
+                            String respuesta = scanner.nextLine();
+
+                            if (respuesta.equalsIgnoreCase("s")) {
+                                boolean renovado = gestorPrestamos.renovarPrestamoRecurso(prestamo);
+                                if (renovado) {
+                                    System.out.println("Préstamo renovado hasta: " + prestamo.getFechaFin());
+                                } else {
+                                    System.out.println("No se pudo renovar el préstamo.");
+                                }
+                            } else {
+                                System.out.println("No se realizó la renovación.");
+                            }
+                        }
+                    } else {
+                        System.out.println("No hay préstamos próximos a vencer.");
+                    }
+                    break;
+
+                case 2:
+                    System.out.println("Alertas de disponibilidad:");
+                    List<Reserva> reservasPendientes = gestorReservas.obtenerReservasPendientes();
+                    AlertaDisponibilidad alertaDisp = new AlertaDisponibilidad(reservasPendientes);
+                    List<Reserva> disponibles = alertaDisp.obtenerReservasDisponibles();
+
+                    if (disponibles.isEmpty()) {
+                        System.out.println("No hay recursos reservados disponibles en este momento.");
+                    } else {
+                        for (Reserva reserva : disponibles) {
+                            RecursoDigital recurso = reserva.getRecursoDigital();
+
+                            System.out.println("El recurso '" + recurso.getTitulo() + "' ya está disponible.");
+
+                            System.out.print("¿Desea realizar el préstamo ahora? (s/n): ");
+                            String respuesta = scanner.nextLine();
+
+                            if (respuesta.equalsIgnoreCase("s")) {
+                                System.out.println("Ingrese su ID de usuario: ");
+                                String idUsuario = scanner.nextLine();
+
+                                Usuario usuario = gestorUsuarios.buscarUsuario(idUsuario);
+                                if (usuario == null) {
+                                    System.out.println("Usuario no encontrado. Regístrese para realizar el préstamo.");
+                                    continue;
+                                }
+
+                                System.out.println("Ingrese la fecha de inicio del préstamo (YYYY-MM-DD):");
+                                LocalDate fechaInicio = LocalDate.parse(scanner.nextLine());
+
+                                System.out.println("Ingrese la fecha de fin del préstamo (YYYY-MM-DD):");
+                                LocalDate fechaFin = LocalDate.parse(scanner.nextLine());
+
+                                gestorPrestamos.prestarRecurso(usuario, recurso, fechaInicio, fechaFin);
+                                gestorReservas.eliminarReserva(reserva);
+                                System.out.println("¡Préstamo registrado con éxito!");
+                            } else {
+                                System.out.println("No se realizó el préstamo.");
+                            }
+                        }
+                    }
+                    break;
+
+                case 3:
+                    HistorialAlertas.mostrarHistorial();
+                    break;
+
+                case 4:
+                    System.out.println("Seleccione nivel mínimo de alerta (INFO, WARNING, ERROR):");
+                    String nivelStr = scanner.nextLine().trim().toUpperCase();
+                    try {
+                        NivelAlerta nuevoNivel = NivelAlerta.valueOf(nivelStr);
+                        gestorNotificaciones.configurarNivelMinimo(nuevoNivel);
+                        System.out.println("Nivel de alerta configurado correctamente.");
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Nivel inválido. Debe ser INFO, WARNING o ERROR.");
+                    }
+                    break;
+                case 5:
+                    System.out.println("Volviendo al menú principal...");
+                    break;
+                default:
+                    System.out.println("Opción no válida. Intente nuevamente.");
+                    break;
+            }
+        } while (opcion != 5);
     }
 }

@@ -1,5 +1,5 @@
 package gestores;
-import models.TipoRecurso;
+import enums.TipoRecurso;
 import models.Prestamo;
 
 

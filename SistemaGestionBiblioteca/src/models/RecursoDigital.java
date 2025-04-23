@@ -1,5 +1,8 @@
 package models;
 
+import enums.EstadoRecurso;
+import enums.TipoRecurso;
+
 public abstract class RecursoDigital {
     private String autor;
     private String titulo;
