@@ -53,7 +53,8 @@ public class CLI {
         System.out.println("4. Gestión de Reservas");
         System.out.println("5. Reportes");
         System.out.println("6. Ver Alertas de Vencimiento");
-        System.out.println("7. Salir");
+        System.out.println("7. Ver Alertas de Disponibilidad");
+        System.out.println("8. Salir");
     }
 
     public void ejecutarMenuPrincipal() throws RecursoNoEncontradoException {
@@ -110,12 +111,57 @@ public class CLI {
                     }
                     break;
                 case 7:
+                    System.out.println("Notificaciones de disponibilidad:");
+                    List<Reserva> reservasPendientes = gestorReservas.obtenerReservasPendientes();
+                    AlertaDisponibilidad alertaDisp = new AlertaDisponibilidad(reservasPendientes);
+
+                    List<Reserva> disponibles = alertaDisp.obtenerReservasDisponibles();
+
+                    if (disponibles.isEmpty()) {
+                        System.out.println("No hay recursos reservados disponibles en este momento.");
+                    } else {
+                        for (Reserva reserva : disponibles) {
+                            RecursoDigital recurso = reserva.getRecursoDigital();
+
+                            System.out.println("El recurso '" + recurso.getTitulo() + " ya está disponible.");
+
+                            System.out.print("¿Desea realizar el préstamo ahora? (s/n): ");
+                            String respuesta = scanner.nextLine();
+
+                            if (respuesta.equalsIgnoreCase("s")) {
+
+                                System.out.println("Ingrese su ID de usuario: ");
+                                String idUsuario = scanner.nextLine();
+
+                                Usuario usuario = gestorUsuarios.buscarUsuario(idUsuario);
+                                if (usuario == null) {
+                                    System.out.println("Usuario no encontrado. Registrese para realizar el préstamo.");
+                                    continue;
+                                }
+
+                                System.out.println("Ingrese la fecha de inicio del préstamo (YYYY-MM-DD):");
+                                LocalDate fechaInicio = LocalDate.parse(scanner.nextLine());
+
+                                System.out.println("Ingrese la fecha de fin del préstamo (YYYY-MM-DD):");
+                                LocalDate fechaFin = LocalDate.parse(scanner.nextLine());
+
+                                gestorPrestamos.prestarRecurso(usuario, recurso, fechaInicio, fechaFin);
+                                gestorReservas.eliminarReserva(reserva);
+                                System.out.println("¡Préstamo registrado con éxito!");
+
+                            } else {
+                                System.out.println("No se realizó el préstamo.");
+                            }
+                        }
+                    }
+                    break;
+                case 8:
                     System.out.println("Saliendo de la biblioteca digital...");
                     break;
                 default:
                     System.out.println("Opción inválida. Intente nuevamente.");
             }
-        } while (opcion != 7);
+        } while (opcion != 8);
         scanner.close();
     }
 
@@ -435,7 +481,7 @@ public class CLI {
         System.out.println("7. Volver al menu principal");
     }
 
-    public void ejecutarMenuPrestamos() {
+    public void ejecutarMenuPrestamos() throws RecursoNoEncontradoException {
         int opcion;
         do {
             mostrarMenuPrestamos();
@@ -542,16 +588,13 @@ public class CLI {
                             System.out.println("Recurso no encontrado.");
                             break;
                         }
-
                         gestorPrestamos.devolverRecurso(recursoDev, idUsuario);
-
-                        gestorReservas.asignarReservaSiExiste(recursoDev, gestorPrestamos.getPrestamos());
-
-
                     } catch (RecursoNoDisponibleException e) {
                         System.out.println("Error al devolver: " + e.getMessage());
                     }
+
                     break;
+
                 case 3:
                     System.out.println("Renovar recurso:");
                     try {
@@ -606,7 +649,7 @@ public class CLI {
                     }
                     break;
                 case 7:
-                    mostrarMenuPrincipal();
+                    ejecutarMenuPrincipal();
                     break;
                 default:
                     System.out.println("Opción inválida. Intente nuevamente");
@@ -621,7 +664,7 @@ public class CLI {
         System.out.println("3. Volver al menu principal");
     }
 
-    public void ejecutarMenuReservas() {
+    public void ejecutarMenuReservas() throws RecursoNoEncontradoException {
         int opcion;
         do {
             mostrarMenuReservas();
@@ -656,7 +699,10 @@ public class CLI {
                             break;
                         }
 
-                        gestorReservas.realizarReserva(usuario, recurso);
+                        System.out.println("Ingrese la fecha de reserva (formato YYYY-MM-DD): ");
+                        String fechaStr = scanner.nextLine();
+                        LocalDate fechaReserva = LocalDate.parse(fechaStr);
+                        gestorReservas.realizarReserva(usuario, recurso, fechaReserva);
                         System.out.println("¡Reserva realizada con éxito!");
 
                     } catch (Exception e) {
@@ -666,7 +712,7 @@ public class CLI {
 
                 case 2:
                     System.out.println("Reservas pendientes:");
-                    List<Reserva> pendientes = gestorReservas.obtenerReservasPendientes(); // revisar,devuelve objeto
+                    List<Reserva> pendientes = gestorReservas.obtenerReservasPendientes();
 
                     if (pendientes.isEmpty()) {
                         System.out.println("No hay reservas pendientes.");
@@ -680,7 +726,7 @@ public class CLI {
                     }
                     break;
                 case 3:
-                    mostrarMenuPrincipal();
+                    ejecutarMenuPrincipal();
                     break;
                 default:
                     System.out.println("Opción inválida. Intente nuevamente");

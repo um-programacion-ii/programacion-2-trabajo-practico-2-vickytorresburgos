@@ -36,7 +36,6 @@ public class GestorPrestamos {
         Prestamo prestamo = new Prestamo(usuario, recursoDigital, fechaInicio, fechaFin);
         prestamos.add(prestamo);
         System.out.println("[" + Thread.currentThread().getName() + "] Préstamo completado.");
-
     }
 
 
@@ -48,18 +47,13 @@ public class GestorPrestamos {
             System.out.println("No se encontró un préstamo activo para este recurso.");
             return;
         }
-
         if (!prestamoActivo.getUsuario().getId().equals(idUsuario)) {
             System.out.println("Solo el usuario que tomó el préstamo puede devolver este recurso.");
             return;
         }
-
         recurso.setEstado(EstadoRecurso.DISPONIBLE);
         System.out.println("Recurso devuelto correctamente.");
-
-        if (gestorReservas != null) {
-            gestorReservas.asignarReservaSiExiste(recurso, prestamos);
-        }
+        gestorReservas.asignarReservaSiExiste(recurso);
     }
 
     public List<Prestamo> getPrestamos() {
@@ -71,6 +65,7 @@ public class GestorPrestamos {
             throw new RecursoNoDisponibleException("El recurso no está actualmente prestado.");
         }
     }
+
 
     private Prestamo obtenerPrestamoActivo(RecursoDigital recurso) {
         for (Prestamo p : prestamos) {
