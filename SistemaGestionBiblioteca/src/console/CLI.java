@@ -143,6 +143,7 @@ public class CLI {
                     System.out.println("Ingrese el ID del usuario: ");
                     String idEliminar = scanner.nextLine();
                     gestorUsuarios.eliminarUsuario(idEliminar);
+                    System.out.println("Usuario eliminado exitosamente");
                     break;
                 case 3:
                     System.out.println("Buscar Usuario");
@@ -757,11 +758,9 @@ public class CLI {
                         }
                     }
                     break;
-
                 case 3:
                     HistorialAlertas.mostrarHistorial();
                     break;
-
                 case 4:
                     System.out.println("Seleccione nivel mínimo de alerta (INFO, WARNING, ERROR):");
                     String nivelStr = scanner.nextLine().trim().toUpperCase();
@@ -774,7 +773,6 @@ public class CLI {
                     }
                     break;
                 case 5:
-                    System.out.println("Volviendo al menú principal...");
                     break;
                 default:
                     System.out.println("Opción no válida. Intente nuevamente.");
