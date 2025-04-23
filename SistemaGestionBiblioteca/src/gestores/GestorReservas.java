@@ -24,9 +24,9 @@ public class GestorReservas {
         colaReservas.offer(reserva);
     }
 
-    public synchronized void realizarReserva(Usuario usuario, RecursoDigital recurso) {
+    public synchronized void realizarReserva(Usuario usuario, RecursoDigital recurso, LocalDate fechaReserva) {
         System.out.println("[" + Thread.currentThread().getName() + "] Realizando reserva para: " + recurso.getTitulo());
-        Reserva nuevaReserva = new Reserva(usuario, recurso, LocalDate.now());
+        Reserva nuevaReserva = new Reserva(usuario, recurso, fechaReserva);
         agregarReserva(nuevaReserva);
         System.out.println("[" + Thread.currentThread().getName() + "] Reserva agregada a la cola.");
     }
@@ -41,36 +41,29 @@ public class GestorReservas {
         return null;
     }
 
-    public synchronized void asignarReservaSiExiste(RecursoDigital recurso, List<Prestamo> prestamos) {
-        Reserva proximaReserva = obtenerProximaReserva(recurso);
-
-        if (proximaReserva != null) {
-            System.out.println("[" + Thread.currentThread().getName() + "] Asignando reserva si existe para: " + recurso.getTitulo());
-            System.out.println("[" + Thread.currentThread().getName() + "] Recurso asignado automáticamente a " + proximaReserva.getUsuario().getNombre());
-            System.out.println("[" + Thread.currentThread().getName() + "] Préstamo automático desde reserva registrado.");
-            String destino = proximaReserva.getUsuario().getEmail();
-            String mensaje = "Tu reserva del recurso: " + recurso.getTitulo() + " ya esta disponible";
-            gestorNotificaciones.enviar(servicioNotificaciones, destino, mensaje);
-
-            recurso.setEstado(EstadoRecurso.PRESTADO);
-            System.out.println("El recurso fue asignado automáticamente a: ");
-            System.out.println("-> Usuario: " + proximaReserva.getUsuario().getNombre());
-            System.out.println("Válido desde " + LocalDate.now() + " hasta " + LocalDate.now().plusDays(7));
-
-            Prestamo nuevoPrestamo = new Prestamo(
-                    proximaReserva.getUsuario(),
-                    recurso,
-                    LocalDate.now(),
-                    LocalDate.now().plusDays(7)
-            );
-            prestamos.add(nuevoPrestamo);
-            System.out.println("Préstamo automático registrado desde reserva.");
-
-
+    public synchronized void asignarReservaSiExiste(RecursoDigital recurso) {
+        for (Reserva r : colaReservas) {
+            if (r.getRecursoDigital().equals(recurso)) {
+                String destino = r.getUsuario().getEmail();
+                String mensaje = "Hola " + r.getUsuario().getNombre() +
+                        ", el recurso '" + recurso.getTitulo() +
+                        "' que reservaste ya está disponible. ¡Podés hacer el préstamo cuando quieras!";
+                gestorNotificaciones.enviar(servicioNotificaciones, destino, mensaje);
+                break;
+            }
         }
     }
 
     public synchronized List<Reserva> obtenerReservasPendientes() {
         return new ArrayList<>(colaReservas);
     }
+
+    public synchronized void eliminarReserva(Reserva reserva) {
+        if (colaReservas.remove(reserva)) {
+            System.out.println("Reserva eliminada correctamente.");
+        } else {
+            System.out.println("No se encontró la reserva para eliminar.");
+        }
+    }
+
 }
