@@ -7,6 +7,7 @@ import gestores.GestorReservas;
 import gestores.GestorUsuarios;
 import gestores.GestorNotificaciones;
 
+import models.RecordatorioAutomatico;
 import services.NotificacionesService;
 import services.NotificacionesServiceEmail;
 import services.NotificacionesServiceSMS;
@@ -18,12 +19,15 @@ public class Main {
 
         NotificacionesService notificacionesServiceEmail = new NotificacionesServiceEmail();
         NotificacionesService notificacionesServiceSMS = new NotificacionesServiceSMS();
-        GestorNotificaciones gestorNotificaciones = new GestorNotificaciones();
+        GestorNotificaciones gestorNotificaciones = new GestorNotificaciones(notificacionesServiceEmail);
 
         GestorUsuarios gestorUsuarios = new GestorUsuarios();
         GestorRecursos gestorRecursos = new GestorRecursos();
         GestorReservas gestorReservas = new GestorReservas(gestorNotificaciones, notificacionesServiceEmail);
         GestorPrestamos gestorPrestamos = new GestorPrestamos(gestorReservas);
+
+        RecordatorioAutomatico recordatorio = new RecordatorioAutomatico(gestorNotificaciones);
+        recordatorio.iniciarRecordatorios();
 
         Scanner scanner = new Scanner(System.in);
 
@@ -34,7 +38,8 @@ public class Main {
                 notificacionesServiceEmail,
                 notificacionesServiceSMS,
                 gestorPrestamos,
-                gestorReservas);
+                gestorReservas,
+                gestorNotificaciones);
         cli.ejecutarMenuPrincipal();
         scanner.close();
     }

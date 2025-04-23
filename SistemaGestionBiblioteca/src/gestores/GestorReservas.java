@@ -1,5 +1,6 @@
 package gestores;
 
+import enums.NivelAlerta;
 import models.*;
 
 import java.time.LocalDate;
@@ -48,7 +49,7 @@ public class GestorReservas {
                 String mensaje = "Hola " + r.getUsuario().getNombre() +
                         ", el recurso '" + recurso.getTitulo() +
                         "' que reservaste ya está disponible. ¡Podés hacer el préstamo cuando quieras!";
-                gestorNotificaciones.enviar(servicioNotificaciones, destino, mensaje);
+                gestorNotificaciones.enviar(servicioNotificaciones, destino, NivelAlerta.INFO, mensaje);
                 break;
             }
         }

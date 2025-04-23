@@ -1,5 +1,6 @@
 package gestores;
 
+import enums.EstadoRecurso;
 import exceptions.RecursoNoDisponibleException;
 import interfaces.Prestable;
 import models.*;

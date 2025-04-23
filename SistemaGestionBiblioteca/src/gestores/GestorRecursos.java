@@ -1,7 +1,7 @@
 package gestores;
+import enums.TipoRecurso;
 import exceptions.RecursoNoDisponibleException;
 import exceptions.RecursoNoEncontradoException;
-import interfaces.Prestable;
 import interfaces.Renovable;
 import models.*;
 import java.util.ArrayList;

@@ -1,5 +1,6 @@
 package models;
 
+import enums.TipoRecurso;
 import interfaces.Prestable;
 import interfaces.Renovable;
 

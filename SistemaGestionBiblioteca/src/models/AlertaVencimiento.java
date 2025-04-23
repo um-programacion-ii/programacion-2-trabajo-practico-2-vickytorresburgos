@@ -1,5 +1,7 @@
 package models;
 
+import enums.EstadoRecurso;
+
 import java.time.LocalDate;
 import java.util.*;
 
